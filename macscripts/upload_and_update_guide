@@ -1,0 +1,6 @@
+#!/bin/bash
+cd ~/Desktop/Kodi
+sshpass -p '3L3phunk84%' rsync --progress ./WebGrab++.config.xml iainstott@192.168.0.200:/home/iainstott/wg++/
+sshpass -p '3L3phunk84%' ssh iainstott@192.168.0.200 '/home/iainstott/wg++/updateguide.sh' 
+osascript -e 'display notification "TV Guide Creation" with title "Done"'
+osascript -e 'tell application "Terminal" to quit'

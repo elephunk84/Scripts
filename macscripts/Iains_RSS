@@ -1,0 +1,80 @@
+#!/bin/bash
+TODAY=$(date +"%d/%m/%Y")
+BUILD=$(date +"%Y%m%d")
+
+### IAINSRSS
+
+rm -rf ~/Desktop/Kodi/IainsRSS.xml
+echo "Please enter details of bulid: "
+read details
+echo '<?xml version="1.0" encoding="utf-8" standalone="no"?>' >> ~/Desktop/Kodi/IainsRSS.xml
+echo '<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">' >> ~/Desktop/Kodi/IainsRSS.xml
+echo "    <channel>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "        <title>Iains RSS</title>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "        <link>http://iaincstott.co.uk</link>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "        <description>Iain's RSS Feed</description>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "        <generator>Feeder 3 3.0.3(2493); Mac OS X Version 10.10.5 (Build 14F27) http://reinventedsoftware.com/feeder/</generator>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "        <docs>http://blogs.law.harvard.edu/tech/rss</docs>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "        <language>en</language>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "        <pubDate>Fri, 28 Aug 2015 14:46:34 +0100</pubDate>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "		  <lastBuildDate>Sun, 13 Sep 2015 10:08:12 +0100</lastBuildDate>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo '        <atom:link href="http://iaincstott.co.uk/kodirepo/rssfeed/IainsRSS.xml" rel="self" type="application/rss+xml"></atom:link>' >> ~/Desktop/Kodi/IainsRSS.xml
+echo "        <item>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "            <title>[ $TODAY - $details ]</title>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "            <pubDate>Thu, 10 Sep 2015 19:36 +0100</pubDate>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "            <description></description>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "            <link></link>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "            <author></author>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "            <guid>E8B6A589-E099-4C0F-A722-7326FF3D25E9</guid>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "        </item>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "        <item>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "            <title>For help and support please visit http://iaincstott.co.uk/tutorials</title>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "            <author>(null) ( Iain Stott)</author>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "            <pubDate>Sun, 13 Sep 2015 22:04 +0100</pubDate>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "        </item>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "    </channel>" >> ~/Desktop/Kodi/IainsRSS.xml
+echo "</rss>" >> ~/Desktop/Kodi/IainsRSS.xml
+sshpass -p '3L3phunk84%' rsync /Users/iainstott/Desktop/Kodi/IainsRSS.xml root@192.168.0.200:/var/www/iaincstott.co.uk/kodirepo/rssfeeds/
+sshpass -p '3L3phunk84%' ssh root@192.168.0.200 'chmod 777 /var/www/iaincstott.co.uk/kodirepo/rssfeeds/IainsRSS.xml'
+sshpass -p '3L3phunk84%' ssh root@192.168.0.200 'chown 1000:1000 /var/www/iaincstott.co.uk/kodirepo/rssfeeds/IainsRSS.xml'
+
+### BUILD
+
+rm -rf ~/Desktop/Kodi/Build*.xml
+echo '<rss version="2.0">' >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "    <channel>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "        <title>Build Info</title>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "        <link></link>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "        <description>This is a new and still empty RSS feed channel</description>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "        <language>en-en</language>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "        <copyright></copyright>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "        <lastBuildDate>Mon, 14 Sep 2015 02:56:42 +0100</lastBuildDate>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "        <pubDate>Sun, 13 Sep 2015 03:55:40 +0100</pubDate>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "        <generator>ecoFeed</generator>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "        <category></category>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "        <managingEditor>(null) ( Iain Stott)</managingEditor>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "        <webMaster>(null) ( Iain Stott)</webMaster>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "        <ttl>360</ttl>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "        <item>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "            <title>Currently Installed - $TODAY</title>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "            <author>(null) ( Iain Stott)</author>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "            <pubDate>Sun, 13 Sep 2015 19:33 +0100</pubDate>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "        </item>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "    </channel>" >> ~/Desktop/Kodi/Build$BUILD.xml
+echo "</rss>" >> ~/Desktop/Kodi/Build$BUILD.xml
+sshpass -p '3L3phunk84%' rsync /Users/iainstott/Desktop/Kodi/Build$BUILD.xml root@192.168.0.200:/var/www/iaincstott.co.uk/kodirepo/rssfeeds/
+sshpass -p '3L3phunk84%' ssh root@192.168.0.200 'chmod 777 /var/www/iaincstott.co.uk/kodirepo/rssfeeds/Build*.xml'
+sshpass -p '3L3phunk84%' ssh root@192.168.0.200 'chown 1000:1000 /var/www/iaincstott.co.uk/kodirepo/rssfeeds/Build*.xml'
+
+### KODI RSSFEEDS.XML
+
+rm -rf ~/Library/Application\ Support/Kodi/userdata/RssFeeds.xml
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' >> ~/Library/Application\ Support/Kodi/userdata/RssFeeds.xml
+echo "<rssfeeds>" >> ~/Library/Application\ Support/Kodi/userdata/RssFeeds.xml
+echo "  <!--RSS feeds. To have multiple feeds, just add a feed to the set. You can also have multiple sets.-->" >> ~/Library/Application\ Support/Kodi/userdata/RssFeeds.xml
+echo "  <!--To use different sets in your skin, each must be called from skin with a unique id.-->" >> ~/Library/Application\ Support/Kodi/userdata/RssFeeds.xml
+echo '  <set id="1">' >> ~/Library/Application\ Support/Kodi/userdata/RssFeeds.xml
+echo "    <feed updateinterval=\"30\">http://iaincstott.co.uk/kodirepo/rssfeeds/Build$BUILD.xml</feed>" >> ~/Library/Application\ Support/Kodi/userdata/RssFeeds.xml
+echo '    <feed updateinterval="30">http://iaincstott.co.uk/kodirepo/rssfeeds/IainsRSS.xml</feed>' >> ~/Library/Application\ Support/Kodi/userdata/RssFeeds.xml
+echo "  </set>" >> ~/Library/Application\ Support/Kodi/userdata/RssFeeds.xml
+echo "</rssfeeds>" >> ~/Library/Application\ Support/Kodi/userdata/RssFeeds.xml

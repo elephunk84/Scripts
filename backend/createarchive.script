@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+cd /$HOME/
+##Change Variables In Files
+sed -i s/192.168.0.100/192.168.0.4/g ./scripts/Menu
+sed -i s/192.168.0.100/192.168.0.4/g ./scripts/tools/*.script
+sed -i s/3L3phunk84%/cAn7ona407%/g ./scripts/tools/update_xbmc.script
+sed -i s/192.168.0.12/192.168.0.5/g ./scripts/sorttv.script
+##Create Package and Upload
+zip -r Scripts.zip ./scripts/
+scp ./Scripts.zip $USER@192.168.0.100:/media/Software/www/config/
+##Cleanup
+rm ./Scripts.zip
+sed -i s/192.168.0.4/192.168.0.100/g ./scripts/Menu
+sed -i s/192.168.0.4/192.168.0.100/g ./scripts/tools/*.script
+sed -i s/cAn7ona407%/3L3phunk84%/g ./scripts/tools/update_xbmc.script
+sed -i s/192.168.0.5/192.168.0.12/g ./scripts/sorttv.script

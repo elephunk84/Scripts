@@ -1,0 +1,34 @@
+#!/bin/bash
+
+cd ~/Desktop/Kodi/Config/addons/plugin.video.iainstool
+version='version="'$tool_ver'"'
+echo $tool_ver >> ./version
+echo '' | cat - changelog.txt | tee changelog.txt
+echo '- '$details4 | cat - changelog.txt | tee changelog.txt
+echo '- '$details3 | cat - changelog.txt | tee changelog.txt
+echo '- '$details2 | cat - changelog.txt | tee changelog.txt
+echo '- '$details1 | cat - changelog.txt | tee changelog.txt
+echo 'Details' | cat - changelog.txt | tee changelog.txt
+echo '------------------------------------------------------' | cat - changelog.txt | tee changelog.txt
+echo 'v'$tool_ver | cat - changelog.txt | tee changelog.txt
+echo '------------------------------------------------------' | cat - changelog.txt | tee changelog.txt
+rm -rf ./addon.xml
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' >> ./addon.xml
+echo '<addon id="plugin.video.iainstool" name="Iains Update Tool" '$version' provider-name="iaincstott.co.uk">' >> ./addon.xml
+echo '  <requires>' >> ./addon.xml
+echo '      <import addon="xbmc.python" version="2.19.0"/>' >> ./addon.xml
+echo '      <import addon="script.module.httplib2" version="0.8.0" />' >> ./addon.xml
+echo '      <import addon="script.module.oauth2client" version="1.4.7" />' >> ./addon.xml
+echo '      <import addon="script.module.uritemplate" version="0.6" />' >> ./addon.xml
+echo '      <import addon="script.module.yaml" version="3.11"/>' >> ./addon.xml
+echo '      <import addon="script.module.googleapi" version="1.4.0" />' >> ./addon.xml
+echo '  </requires>' >> ./addon.xml
+echo '  <extension point="xbmc.python.pluginsource" library="default.py">' >> ./addon.xml
+echo '        <provides>video executable</provides>' >> ./addon.xml
+echo '  </extension>' >> ./addon.xml
+echo '  <extension point="xbmc.addon.metadata">' >> ./addon.xml
+echo '    <summary lang="en">Iains Update Tool</summary>' >> ./addon.xml
+echo '    <description lang="en">Easy Install With Iains Update Tool</description>' >> ./addon.xml
+echo '    <platform>all</platform>' >> ./addon.xml
+echo '  </extension>' >> ./addon.xml
+echo '</addon>' >> ./addon.xml

@@ -1,0 +1,41 @@
+#!/bin/bash
+echo "Iain's Tool Version??"
+read tool_ver
+if [ ${#tool_ver} -lt 1 ]; then exit
+else
+	echo "FTV Guide Version??"
+	read ftv_ver
+	echo "Please Give Some Details For The Change Log"
+	echo "5 Lines"
+	echo "Changelog Details Line 1"
+	read details1
+	echo "Changelog Details Line 2"
+	read details2
+	echo "Changelog Details Line 3"
+	read details3
+	echo "Changelog Details Line 4"
+	read details4	
+	export tool_ver
+	export ftv_ver
+	export details1
+	export details2
+	export details3
+	export details4
+	sh /Users/iainstott/OneDrive/Dev/Scripts/macscripts/update_versions
+	cd "/Users/iainstott/OneDrive/Dev/Git Repo/Kodi-Addons/"
+	zip -r --exclude=*.zip /Users/iainstott/Desktop/Kodi/plugin.video.iainstool-${tool_ver}.zip ./plugin.video.iainstool
+	zip -r --exclude=*.zip /Users/iainstott/Desktop/Kodi/repository.elephunk84.zip ./repository.elephunk84
+	zip -r --exclude=*.zip /Users/iainstott/Desktop/Kodi/script.ftvguide-${ftv_ver}.zip ./script.ftvguide
+	cp /Users/iainstott/Desktop/Kodi/plugin.video.iainstool-${tool_ver}.zip "/Users/iainstott/OneDrive/Dev/Git Repo/Kodi-Addons/plugin.video.iainstool/"
+	cp "/Users/iainstott/Desktop/Kodi/repository.elephunk84.zip" "/Users/iainstott/OneDrive/Dev/Git Repo/Kodi-Addons/repository.elephunk84/"
+	cp /Users/iainstott/Desktop/Kodi/script.ftvguide-${ftv_ver}.zip "/Users/iainstott/OneDrive/Dev/Git Repo/Kodi-Addons/script.ftvguide/"
+	rm -rf "/Users/iainstott/OneDrive/Dev/Git Repo/Kodi-Addons/addons/plugin.video.iainstool"
+	rm -rf "/Users/iainstott/OneDrive/Dev/Git Repo/Kodi-Addons/addons/repository.elephunk84"
+	rm -rf "/Users/iainstott/OneDrive/Dev/Git Repo/Kodi-Addons/addons/script.ftvguide"
+	rsync -a "/Users/iainstott/OneDrive/Dev/Git Repo/Kodi-Addons/plugin.video.iainstool" "/Users/iainstott/OneDrive/Dev/Git Repo/Kodi-Addons/addons/" 
+	rsync -a "/Users/iainstott/OneDrive/Dev/Git Repo/Kodi-Addons/repository.elephunk84" "/Users/iainstott/OneDrive/Dev/Git Repo/Kodi-Addons/addons/" 
+	rsync -a "/Users/iainstott/OneDrive/Dev/Git Repo/Kodi-Addons/script.ftvguide" "/Users/iainstott/OneDrive/Dev/Git Repo/Kodi-Addons/addons/"
+	./python3 ./addons_xml_generator.py
+	git push origin master
+	osascript -e 'display notification "Kodi Plugin Creation Complete" with title "Done"'
+fi

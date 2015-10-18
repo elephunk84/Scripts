@@ -1,0 +1,8 @@
+#!/bin/bash
+cd ~/Library/Application\ Support/Kodi/userdata/addon_data/script.renegadestv/
+content=$( cat ./favourites.xml.temp )
+channel=$( cat ./channel.txt )
+echo $content >> ./favourites.xml
+echo "</favourites>" >> ./favourites.xml
+rm -rf ./favourites.xml.temp
+cp ./favourites.xml "/Users/iainstott/Library/Application Support/Kodi/userdata/addon_data/plugin.program.super.favourites/Super Favourites/$channel/favourites.xml"

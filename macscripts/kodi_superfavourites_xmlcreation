@@ -1,0 +1,5 @@
+#!/bin/bash
+cd ~/Library/Application\ Support/Kodi/userdata/addon_data/script.renegadestv/
+rm -rf ./favourites.xml
+touch ./favourites.xml
+echo "<favourites>" >> ./favourites.xml

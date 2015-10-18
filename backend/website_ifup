@@ -1,0 +1,17 @@
+#!/bin/bash
+red=`tput setaf 1`
+green=`tput setaf 2`
+reset=`tput sgr0`
+ifup=$(curl http://iaincstott.co.uk/up)
+check=${#ifup}
+if [ $check -ge 6 ]; then
+    status=UP
+else
+    status=DOWN
+fi
+if [ $status = UP ]
+then 
+	echo "${green}Online${reset}"
+else
+	echo "${red}Offline${reset}"
+fi

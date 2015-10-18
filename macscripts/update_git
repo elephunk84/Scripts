@@ -1,0 +1,4 @@
+#!/bin/bash
+ssh root@192.168.0.200 'sh ~/update_git.sh'
+osascript -e 'display notification "Kodi Config Creation Complete" with title "Done"'
+#osascript -e 'tell application "Terminal" to quit'

@@ -1,0 +1,56 @@
+#!/bin/bash
+killall -9 Kodi 
+reset
+echo "Updating RSS & XML Files....."
+sh /Users/iainstott/OneDrive/Dev/Scripts/macscripts/Iains_RSS
+echo "Updating TV Settings Archive....."
+python /Users/iainstott/OneDrive/Dev/Scripts/macscripts/kodi_superfavourites_sorting.py
+sh /Users/iainstott/OneDrive/Dev/Scripts/macscripts/copy_current_tv_config
+echo "Updating ZIPS and GIT....."
+sh /Users/iainstott/OneDrive/Dev/Scripts/macscripts/make_plugin_zips
+echo "Pre Backup Maintainence....."
+unlink "/Users/iainstott/Library/Application Support/Kodi/addons/plugin.video.iainstool"
+unlink "/Users/iainstott/Library/Application Support/Kodi/addons/script.ftvguide"
+mkdir "/Users/iainstott/Library/Application Support/Kodi/addons/plugin.video.iainstool"
+mkdir "/Users/iainstott/Library/Application Support/Kodi/addons/script.ftvguide"
+rsync -a "/Users/iainstott/OneDrive/Dev/Git Repo/Kodi-Addons/plugin.video.iainstool" "/Users/iainstott/Library/Application Support/Kodi/addons/"
+rsync -a "/Users/iainstott/OneDrive/Dev/Git Repo/Kodi-Addons/script.ftvguide" "/Users/iainstott/Library/Application Support/Kodi/addons/"
+rsync -a "/Users/iainstott/Library/Application Support/Kodi/userdata/Thumbnails/" "/Users/iainstott/Desktop/Kodi/Thumbnails/"
+rm -rf "/Users/iainstott/Library/Application Support/Kodi/userdata/Thumbnails/"
+rm -rf "/Users/iainstott/Library/Application Support/Kodi/addons/packages/"
+mv "/Users/iainstott/Library/Application Support/Kodi/addons/plugin.video.stalker/" "/Users/iainstott/Desktop/Kodi/plugin.video.stalker"
+echo "Copying Config To Backup....."
+rsync -a "/Users/iainstott/Library/Application Support/Kodi/userdata/" "/Users/iainstott/Desktop/Kodi/Current Config/userdata"
+rsync -a "/Users/iainstott/Library/Application Support/Kodi/addons/" "/Users/iainstott/Desktop/Kodi/Current Config/addons/"
+echo "Post Backup Maintainence....."
+rm -rf "/Users/iainstott/Library/Application Support/Kodi/addons/plugin.video.iainstool"
+rm -rf "/Users/iainstott/Library/Application Support/Kodi/addons/script.ftvguide"
+ln -s "/Users/iainstott/OneDrive/Dev/Git Repo/Kodi-Addons/plugin.video.iainstool" "/Users/iainstott/Library/Application Support/Kodi/addons/"
+ln -s "/Users/iainstott/OneDrive/Dev/Git Repo/Kodi-Addons/script.ftvguide" "/Users/iainstott/Library/Application Support/Kodi/addons/"
+rsync -a "/Users/iainstott/Desktop/Kodi/Thumbnails/" "/Users/iainstott/Library/Application Support/Kodi/userdata/Thumbnails/"
+rm -rf "/Users/iainstott/Desktop/Kodi/Thumbnails/"
+mv "/Users/iainstott/Desktop/Kodi/plugin.video.stalker" "/Users/iainstott/Library/Application Support/Kodi/addons/plugin.video.stalker/"
+cd "/Users/iainstott/Desktop/Kodi/Current Config/"
+sshpass -p '3L3phunk84%' rsync --progress ./ root@192.168.0.200:/mnt/Backup/Kodi_Config
+echo "Creating Archive....."
+cd "/Users/iainstott/Desktop/Kodi/Current Config/"
+find . -type f -name '*.pyo' -delete
+find . -type f -name '*.pyc' -delete
+cd "/Users/iainstott/Desktop/Kodi/Current Config//userdata/addon_data/Media"
+find . -type f -name '*.jpg' -delete
+cd "/Users/iainstott/Desktop/Kodi/Current Config//userdata/addon_data/script.artwork.downloader"
+find . -type f -name '*.jpg' -delete
+cd "/Users/iainstott/Desktop/Kodi/Current Config/"
+rm -rf ./userdata/Database
+rm -rf ../backup.zip
+zip -r /Users/iainstott/Desktop/Kodi/backup.zip "./addons" > /dev/null
+zip -r /Users/iainstott/Desktop/Kodi/backup.zip "./userdata" > /dev/null
+rm -rf "/Users/iainstott/Desktop/Kodi/Current Config/userdata"
+rm -rf "/Users/iainstott/Desktop/Kodi/Current Config/addons"
+echo "Copying Archive To Server....."
+sshpass -p '3L3phunk84%' ssh root@192.168.0.200 'mv /var/www/iaincstott.co.uk/kodirepo/backup.zip /var/www/iaincstott.co.uk/kodirepo/backup_current.zip'
+sshpass -p '3L3phunk84%' rsync --progress ../backup.zip root@192.168.0.200:/var/www/iaincstott.co.uk/kodirepo
+sshpass -p '3L3phunk84%' ssh root@192.168.0.200 'chmod 777 /var/www/iaincstott.co.uk/kodirepo/backup.zip'
+sshpass -p '3L3phunk84%' ssh root@192.168.0.200 'chown 1000:1000 /var/www/iaincstott.co.uk/kodirepo/backup.zip'
+osascript -e 'display notification "Kodi Config Creation" with title "Done"'
+osascript -e 'tell application "Terminal" to quit'

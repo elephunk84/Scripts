@@ -1,0 +1,103 @@
+#!/bin/bash
+cd /Users/iainstott/Library/Application\ Support/Kodi/userdata/addon_data/script.renegadestv/
+rm -rf ./addons2.ini
+curl -O https://raw.githubusercontent.com/RenegadesTV/repository.renegadestv/master/addons2.ini
+rm -rf ./*.txt
+touch ./name.txt
+touch ./url.txt
+
+grep -i "SKY SPORTS" ./addons2.ini >> ./skysports.txt
+grep -i "SKY_SPORTS" ./addons2.ini >> ./skysports.txt
+grep -i "Sky Sport" ./addons2.ini >> ./skysports.txt
+grep -i "SKYSPORTS" ./addons2.ini >> ./skysports.txt
+grep -i "Sky_Sports" ./addons2.ini >> ./skysports.txt
+grep -i "Sky Sports" ./addons2.ini >> ./skysports.txt
+grep -i "SkySports" ./addons2.ini >> ./skysports.txt
+grep -i "BT" ./addons2.ini >> ./btsports.txt
+grep -i "LFCTV" ./addons2.ini >> ./lfc.txt
+grep -i "LFC TV" ./addons2.ini >> ./lfc.txt
+grep -i "Eurosport" ./addons2.ini >> ./eurosport.txt
+grep -i "EUROSPORT" ./addons2.ini >> ./eurosport.txt
+grep -i "eurosport" ./addons2.ini >> ./eurosport.txt
+grep -i "EuroSport" ./addons2.ini >> ./eurosport.txt
+grep -i "Bein" ./addons2.ini >> ./bein.txt
+grep -i "bein" ./addons2.ini >> ./bein.txt
+grep -i "BEIN" ./addons2.ini >> ./bein.txt
+
+grep -i "Sky Sports 1" ./skysports.txt >> ./skysports1.txt
+grep -i "SkySports1" ./skysports.txt >> ./skysports1.txt
+grep -i "SKYSPORTS1" ./skysports.txt >> ./skysports1.txt
+grep -i "SKY_SPORTS_1" ./skysports.txt >> ./skysports1.txt
+grep -i "SKY SPORTS 1" ./skysports.txt >> ./skysports1.txt
+grep -i "Sky_Sports_1" ./skysports.txt >> ./skysports1.txt
+grep -i "Sky Sport 2" ./skysports.txt >> ./skysports2.txt
+grep -i "Sky Sports 2" ./skysports.txt >> ./skysports2.txt
+grep -i "SkySports2" ./skysports.txt >> ./skysports2.txt
+grep -i "SKYSPORTS2" ./skysports.txt >> ./skysports2.txt
+grep -i "SKY_SPORTS_2" ./skysports.txt >> ./skysports2.txt
+grep -i "SKY SPORTS 2" ./skysports.txt >> ./skysports2.txt
+grep -i "Sky_Sports_2" ./skysports.txt >> ./skysports2.txt
+grep -i "Sky Sport 2" ./skysports.txt >> ./skysports2.txt
+grep -i "Sky Sports 3" ./skysports.txt >> ./skysports3.txt
+grep -i "SkySports3" ./skysports.txt >> ./skysports3.txt
+grep -i "SKYSPORTS3" ./skysports.txt >> ./skysports3.txt
+grep -i "SKY_SPORTS_3" ./skysports.txt >> ./skysports3.txt
+grep -i "SKY SPORTS 3" ./skysports.txt >> ./skysports3.txt
+grep -i "Sky_Sports_3" ./skysports.txt >> ./skysports3.txt
+grep -i "Sky Sport 3" ./skysports.txt >> ./skysports3.txt
+grep -i "Sky Sports 4" ./skysports.txt >> ./skysports4.txt
+grep -i "SkySports4" ./skysports.txt >> ./skysports4.txt
+grep -i "SKYSPORTS4" ./skysports.txt >> ./skysports4.txt
+grep -i "SKY_SPORTS_4" ./skysports.txt >> ./skysports4.txt
+grep -i "SKY SPORTS 4" ./skysports.txt >> ./skysports4.txt
+grep -i "Sky_Sports_4" ./skysports.txt >> ./skysports4.txt
+grep -i "Sky Sport 4" ./skysports.txt >> ./skysports4.txt
+grep -i "Sky Sports 5" ./skysports.txt >> ./skysports5.txt
+grep -i "SkySports5" ./skysports.txt >> ./skysports5.txt
+grep -i "SKYSPORTS5" ./skysports.txt >> ./skysports5.txt
+grep -i "SKY_SPORTS_5" ./skysports.txt >> ./skysports5.txt
+grep -i "SKY SPORTS 5" ./skysports.txt >> ./skysports5.txt
+grep -i "Sky_Sports_5" ./skysports.txt >> ./skysports5.txt
+grep -i "Sky Sport 5" ./skysports.txt >> ./skysports5.txt
+grep -i "Sky Sports F1" ./skysports.txt >> ./skysportsF1.txt
+grep -i "SkySportsF1" ./skysports.txt >> ./skysportsF1.txt
+grep -i "SKYSPORTSF1" ./skysports.txt >> ./skysportsF1.txt
+grep -i "SKY_SPORTS_F1" ./skysports.txt >> ./skysportsF1.txt
+grep -i "SKY SPORTS F1" ./skysports.txt >> ./skysportsF1.txt
+grep -i "Sky_Sports_F1" ./skysports.txt >> ./skysportsF1.txt
+grep -i "Sky Sport F1" ./skysports.txt >> ./skysportsF1.txt
+grep -i "Sky Sports News" ./skysports.txt >> ./skysportsnews.txt
+grep -i "SkySportsNews" ./skysports.txt >> ./skysportsnews.txt
+grep -i "SKYSPORTSNEWS" ./skysports.txt >> ./skysportsnews.txt
+grep -i "SKY_SPORTS_NEWS" ./skysports.txt >> ./skysportsnews.txt
+grep -i "SKY SPORTS NEWS" ./skysports.txt >> ./skysportsnews.txt
+grep -i "Sky_Sports_News" ./skysports.txt >> ./skysportsnews.txt
+grep -i "Sky Sport News" ./skysports.txt >> ./skysportsnews.txt
+
+grep -i "Eurosport1" ./eurosport.txt >> ./eurosport1.txt
+grep -i "EUROSPORT1" ./eurosport.txt >> ./eurosport1.txt
+grep -i "Eurosport 1" ./eurosport.txt >> ./eurosport1.txt
+grep -i "EUROSPORT 1" ./eurosport.txt >> ./eurosport1.txt
+grep -i "eurosport1" ./eurosport.txt >> ./eurosport1.txt
+grep -i "eurosport 1" ./eurosport.txt >> ./eurosport1.txt
+grep -i "EuroSport1" ./eurosport.txt >> ./eurosport1.txt
+grep -i "EuroSport 1" ./eurosport.txt >> ./eurosport1.txt
+grep -i "EuroSport_1" ./eurosport.txt >> ./eurosport1.txt
+grep -i "eurosport_1" ./eurosport.txt >> ./eurosport1.txt
+grep -i "Eurosport_1" ./eurosport.txt >> ./eurosport1.txt
+grep -i "EUROSPORT_1" ./eurosport.txt >> ./eurosport1.txt
+
+grep -i "Eurosport2" ./eurosport.txt >> ./eurosport2.txt
+grep -i "EUROSPORT2" ./eurosport.txt >> ./eurosport2.txt
+grep -i "Eurosport 2" ./eurosport.txt >> ./eurosport2.txt
+grep -i "EUROSPORT 2" ./eurosport.txt >> ./eurosport2.txt
+grep -i "eurosport2" ./eurosport.txt >> ./eurosport2.txt
+grep -i "eurosport 2" ./eurosport.txt >> ./eurosport2.txt
+grep -i "EuroSport2" ./eurosport.txt >> ./eurosport2.txt
+grep -i "EuroSport 2" ./eurosport.txt >> ./eurosport2.txt
+grep -i "EuroSport_2" ./eurosport.txt >> ./eurosport2.txt
+grep -i "eurosport_2" ./eurosport.txt >> ./eurosport2.txt
+grep -i "Eurosport_2" ./eurosport.txt >> ./eurosport2.txt
+grep -i "EUROSPORT_2" ./eurosport.txt >> ./eurosport2.txt
+
+chmod 777 ./*.txt
