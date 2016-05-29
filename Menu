@@ -6,7 +6,7 @@ red=`tput setaf 1`
 green=`tput setaf 2`
 blue=`tput setaf 6`
 reset=`tput sgr0`
-cd ~/OneDrive/Dev/
+cd ~/GitRepo
 export rpi1_ip="192.168.0.200" 
 export rpi2_ip="192.168.1.2" 
 export rpi3_ip="192.168.1.3" 
@@ -23,12 +23,11 @@ rpi6_ifup=$(export machine=$rpi6_ip && ./Scripts/backend/ifup)
 server_ifup=$(export machine=$server_ip && ./Scripts/backend/ifup)
 export my_ip=$(dig +short myip.opendns.com @resolver1.opendns.com)
 export PUBLIC_IP=$my_ip
-export internal_ip=$(ipconfig getifaddr en0)
+export internal_ip=$(hostname -I)
 export iaincstott_ip=$(dig +short iaincstott.co.uk @resolver1.opendns.com)
 export domain_ip=$iaincstott_ip
 website_up=$(./Scripts/backend/website_ifup)
 uptime=$(  uptime | tr "," " " | cut -f4-5 -d" ")
-os=$(sw_vers -productVersion)
 df_websites=$(ssh root@192.168.0.200 df -H /mnt/Backup /mnt/Storage /mnt/Websites /)
 if [ $domain_ip == $PUBLIC_IP ]; then 
 	export DOMAIN_IP="${green}$domain_ip${reset}"
@@ -40,25 +39,20 @@ if [ $domain_ip == $PUBLIC_IP ]; then
 else
 	export public_ip="${red}$PUBLIC_IP${reset}"
 fi
-if [ $os == 10.10 ]; then
-	OS="Yosemite"
-elif [ $os == 10.11 ]; then
-	OS="El Capitan"
-fi
 while :
 do
 clear
-echo "****************************************************************************************************"
+echo "******************************************************************"
 echo "* ${blue}Systems Menu${reset} *				${blue}RPi 1 = ${reset}$rpi1_ifup "
 echo "* ${blue}Domain IP = ${reset}$DOMAIN_IP *			${blue}RPi 2 = ${reset}$rpi2_ifup"
 echo "* ${blue}Public IP = ${reset}$public_ip *			${blue}RPi 3 = ${reset}$rpi3_ifup" 
 echo "* ${blue}Laptop IP = ${reset}${green}$internal_ip${reset} *			${blue}RPi 4 = ${reset}$rpi4_ifup"
 echo "* ${blue}Website = ${reset}$website_up *				${blue}RPi 5 = ${reset}$rpi5_ifup"
 echo "* ${blue}Uptime = ${reset}$uptime 				${blue}RPi 6 = ${reset}$rpi6_ifup"
-echo "* ${blue}OS = ${reset}OS X $os - $OS		       ${blue}Server = ${reset}$server_ifup"
+echo "* ${blue}OS = ${reset}"$(cat /etc/issue.net)"                    ${blue}Server = ${reset}$server_ifup"
 echo "* ${blue}Remote Storage -${green} 
 $df_websites${reset}"
-echo "****************************************************************************************************"
+echo "******************************************************************"
 echo "* [1] SSH Menu"
 echo "* [2] Run Remote App"
 echo "* [3] Kodi Tools"
@@ -71,7 +65,7 @@ echo "* [9] Wake Server"
 echo ""
 echo "* [r] Reload Menu"
 echo "* [x] Exit/Stop *"
-echo "****************************************************************************************************"
+echo "******************************************************************"
 echo "Enter your menu choice [1-0]: "
 read yourch
 case $yourch in
