@@ -54,7 +54,7 @@ do
 		name=Server
 		;;
 	esac
-  if ping -c 1 -W 1 $i > /dev/null; then
+  if ping -W 1 $i > /dev/null; then
 	export ${name}_ifup="On-Line"
   else
     export ${name}_ifup="Off-Line"
