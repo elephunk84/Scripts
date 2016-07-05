@@ -1,0 +1,86 @@
+#!/bin/bash
+BASE_DIR="/home/iainstott/Kodi"
+CURRENT_BUILD=${BASE_DIR}"/Current_Build"
+LAST_BUILD=${BASE_DIR}"/Last_Build"
+KODI_DIR="/home/iainstott/.kodi"
+KODI_ADDONS=${KODI_DIR}"/addons"
+GIT_REPO="/home/iainstott/GitRepo/Kodi-Addons"
+BUILD_ARCHIVE=${BASE_DIR}"/Archive"
+EXTRA_BUILD_ARCHIVE=${BUILD_ARCHIVE}"/Builds"
+ADDON_ARCHIVE=${BUILD_ARCHIVE}"/Addons"
+MY_ADDON_ARCHIVE=${ADDON_ARCHIVE}"/My_Addons"
+
+BACKUP_ZIP=${BASE_DIR}"/backup.zip"
+TODAY=$(date +"%d/%m/%Y")
+BUILD=$(date +"%Y%m%d")
+
+function update_feeds {
+    ###UDATE IAINSRSS
+    rm -rf ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    DETAILS=$(zenity --entry --title="Build Details" --text="Please enter some details about the build")
+    echo ${DETAILS}
+    echo '<?xml version="1.0" encoding="utf-8" standalone="no"?>' >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo '<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">' >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "    <channel>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "        <title>Iains RSS</title>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "        <link>http://iaincstott.co.uk</link>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "        <description>Iain's RSS Feed</description>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "        <generator>Feeder 3 3.0.3(2493); Mac OS X Version 10.10.5 (Build 14F27) http://reinventedsoftware.com/feeder/</generator>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "        <docs>http://blogs.law.harvard.edu/tech/rss</docs>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "        <language>en</language>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "        <pubDate>Fri, 28 Aug 2015 14:46:34 +0100</pubDate>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "		  <lastBuildDate>Sun, 13 Sep 2015 10:08:12 +0100</lastBuildDate>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo '        <atom:link href="http://iaincstott.co.uk/kodirepo/rssfeed/IainsRSS.xml" rel="self" type="application/rss+xml"></atom:link>' >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "        <item>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "            <title>[ $TODAY - $DETAILS ]</title>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "            <pubDate>Thu, 10 Sep 2015 19:36 +0100</pubDate>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "            <description></description>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "            <link></link>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "            <author></author>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "            <guid>E8B6A589-E099-4C0F-A722-7326FF3D25E9</guid>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "        </item>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "        <item>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "            <title>For help and support please visit http://iaincstott.co.uk/tutorials</title>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "            <author>(null) ( Iain Stott)</author>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "            <pubDate>Sun, 13 Sep 2015 22:04 +0100</pubDate>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "        </item>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "     </channel>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    echo "</rss>" >> ${BASE_DIR}/rssfeeds/IainsRSS.xml
+    ###CREATE BUILD INFO RSS
+    rm -rf ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo '<rss version="2.0">' >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "    <channel>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "        <title>Build Info</title>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "        <link></link>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "        <description>This is a new and still empty RSS feed channel</description>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "        <language>en-en</language>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "        <copyright></copyright>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "        <lastBuildDate>Mon, 14 Sep 2015 02:56:42 +0100</lastBuildDate>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "        <pubDate>Sun, 13 Sep 2015 03:55:40 +0100</pubDate>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "        <generator>ecoFeed</generator>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "        <category></category>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "        <managingEditor>(null) ( Iain Stott)</managingEditor>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "        <webMaster>(null) ( Iain Stott)</webMaster>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "        <ttl>360</ttl>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "        <item>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "            <title>Currently Installed - $TODAY</title>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "            <author>(null) ( Iain Stott)</author>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "            <pubDate>Sun, 13 Sep 2015 19:33 +0100</pubDate>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "        </item>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "    </channel>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    echo "</rss>" >> ${BASE_DIR}/rssfeeds/Build${BUILD}.xml
+    ###UPDATE KODI RSS TO LATEST BUILD
+    rm -rf ~/.kodi/userdata/RssFeeds.xml
+    echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' >> ~/.kodi/userdata/RssFeeds.xml
+    echo "<rssfeeds>" >> ~/.kodi/userdata/RssFeeds.xml
+    echo "  <!--RSS feeds. To have multiple feeds, just add a feed to the set. You can also have multiple sets.-->" >> ~/.kodi/userdata/RssFeeds.xml
+    echo "  <!--To use different sets in your skin, each must be called from skin with a unique id.-->" >> ~/.kodi/userdata/RssFeeds.xml
+    echo '  <set id="1">' >> ~/.kodi/userdata/RssFeeds.xml
+    echo "    <feed updateinterval=\"30\">http://iaincstott.co.uk/kodirepo/rssfeeds/Build${BUILD}.xml</feed>" >> ~/.kodi/userdata/RssFeeds.xml
+    echo '    <feed updateinterval="30">http://iaincstott.co.uk/kodirepo/rssfeeds/IainsRSS.xml</feed>' >> ~/.kodi/userdata/RssFeeds.xml
+    echo "  </set>" >> ~/.kodi/userdata/RssFeeds.xml
+    echo "</rssfeeds>" >> ~/.kodi/userdata/RssFeeds.xml
+    ###UDATE TO WEB SERVER
+    rsync -v ${BASE_DIR}/rssfeeds/IainsRSS.xml /media/Websites/iaincstott.co.uk/kodirepo/rssfeeds
+    rsync -v ${BASE_DIR}/rssfeeds/Build${BUILD}.xml /media/Websites/iaincstott.co.uk/kodirepo/rssfeeds
+}

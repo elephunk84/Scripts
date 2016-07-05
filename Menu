@@ -55,9 +55,9 @@ do
 		;;
 	esac
   if ping -W 1 $i > /dev/null; then
-	export ${name}_ifup="On-Line"
+	export ${name}_ifup="${green}On-Line${reset}"
   else
-    export ${name}_ifup="Off-Line"
+   export ${name}_ifup="${red}Off-Line${reset}"
   fi
 done
 export my_ip=$(dig +short myip.opendns.com @resolver1.opendns.com)
@@ -83,7 +83,7 @@ do
 clear
 echo "******************************************************************"
 echo "* ${blue}Systems Menu${reset} *				${blue}RPi 1 = ${reset}$Raspi1_ifup "
-echo "* ${blue}Domain IP = ${reset}$DOMAIN_IP *				${blue}RPi 2 = ${reset}$Raspi2_ifup"
+echo "* ${blue}Domain IP = ${reset}$DOMAIN_IP *			${blue}RPi 2 = ${reset}$Raspi2_ifup"
 echo "* ${blue}Public IP = ${reset}$public_ip *			${blue}RPi 3 = ${reset}$Raspi3_ifup" 
 echo "* ${blue}Laptop IP = ${reset}${green}$internal_ip${reset} *			${blue}RPi 4 = ${reset}$Raspi4_ifup"
 echo "* ${blue}Website = ${reset}$website_up *				${blue}RPi 5 = ${reset}$Raspi5_ifup"
@@ -111,7 +111,7 @@ read yourch
 case $yourch in
 1) osascript ./Mac\ Scripts/002\ -\ SSH\ Connect.scpt ;;
 2) nemo sftp://$USER@192.168.0.4/media/Software/Downloads/ ;;
-3) ./Scripts/backend ;;
+3) ./KodiRepo/Menu ;;
 4) ssh -X $USER@192.168.0.4 pyrenamer ;;
 5) /home/iainstott/.bin/ddusb & ;;
 6)  ;;
