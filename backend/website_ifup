@@ -2,7 +2,7 @@
 red=`tput setaf 1`
 green=`tput setaf 2`
 reset=`tput sgr0`
-#ifup=$(curl http://iaincstott.co.uk/up)
+ifup=$(curl http://iaincstott.co.uk/up)
 check=${#ifup}
 if [ $check -ge 6 ]; then
     status=UP

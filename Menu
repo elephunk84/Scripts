@@ -88,7 +88,7 @@ echo "* ${blue}Public IP = ${reset}$public_ip *			${blue}RPi 3 = ${reset}$Raspi3
 echo "* ${blue}Laptop IP = ${reset}${green}$internal_ip${reset} *			${blue}RPi 4 = ${reset}$Raspi4_ifup"
 echo "* ${blue}Website = ${reset}$website_up *				${blue}RPi 5 = ${reset}$Raspi5_ifup"
 echo "* ${blue}Uptime = ${reset}$uptime 				${blue}RPi 6 = ${reset}$Raspi6_ifup"
-echo "* ${blue}OS = ${reset}"$(cat /etc/issue.net)"                    ${blue}Server = ${reset}$Server_ifup"
+echo "* ${blue}OS = ${reset}"$(cat /etc/issue.net)"                    	${blue}Server = ${reset}$Server_ifup"
 echo "* ${blue}Remote Storage -${green} 
 $df_websites${reset}"
 echo "******************************************************************"
