@@ -4,14 +4,13 @@
 #
 
 shopt -s expand_aliases
-source ~/.bash_aliases
 
 echo "Loading please wait...."
 red=`tput setaf 1`
 green=`tput setaf 2`
 blue=`tput setaf 6`
 reset=`tput sgr0`
-cd ~/GitRepo
+cd ~/
 export raspi1="192.168.0.200" 
 export raspi2="192.168.1.2" 
 export raspi3="192.168.1.3" 
@@ -23,51 +22,14 @@ export raspiD="192.168.0.111"
 export server="192.168.0.110" 
 export server_mac="F0:4D:A2:DB:E0:D8"
 declare ip_address=("$raspi1" "$raspi2" "$raspi3" "$raspi4" "$raspi5" "$raspi6" "$raspi7" "$raspiD" "$server")
-for i in "${ip_address[@]}"
-do
-  case $i in
-	192.168.0.200)
-		name=Raspi1
-		;;
-	192.168.1.2)
-		name=Raspi2
-		;;
-	192.168.1.3)
-		name=Raspi3
-		;;
-	192.168.1.4)
-		name=Raspi4
-		;;
-	192.168.1.5)
-		name=Raspi5
-		;;
-	192.168.0.130)
-		name=Raspi6
-		;;
-	192.168.0.131)
-		name=Raspi7
-		;;
-	192.168.0.111)
-		name=RaspiD
-		;;
-	192.168.0.110)
-		name=Server
-		;;
-	esac
-  if ping -W 1 $i > /dev/null; then
-	export ${name}_ifup="${green}On-Line${reset}"
-  else
-   export ${name}_ifup="${red}Off-Line${reset}"
-  fi
-done
 export my_ip=$(dig +short myip.opendns.com @resolver1.opendns.com)
 export PUBLIC_IP=$my_ip
 export internal_ip=$(hostname -I)
 export iaincstott_ip=$(dig +short iaincstott.co.uk @resolver1.opendns.com)
 export domain_ip=$iaincstott_ip
-website_up=$(./Scripts/backend/website_ifup)
+#website_up=$(./Scripts/backend/website_ifup)
 uptime=$(  uptime | tr "," " " | cut -f4-5 -d" ")
-df_websites=$(ssh root@192.168.0.200 df -H /mnt/Backup /mnt/Storage /mnt/Websites /)
+df_websites=$(ssh root@192.168.0.4 df -H /mnt/Backup /mnt/Storage /mnt/Websites /)
 if [ $domain_ip == $PUBLIC_IP ]; then 
 	export DOMAIN_IP="${green}$domain_ip${reset}"
 else
@@ -82,13 +44,13 @@ while :
 do
 clear
 echo "******************************************************************"
-echo "* ${blue}Systems Menu${reset} *				${blue}RPi 1 = ${reset}$Raspi1_ifup "
-echo "* ${blue}Domain IP = ${reset}$DOMAIN_IP *			${blue}RPi 2 = ${reset}$Raspi2_ifup"
-echo "* ${blue}Public IP = ${reset}$public_ip *			${blue}RPi 3 = ${reset}$Raspi3_ifup" 
-echo "* ${blue}Laptop IP = ${reset}${green}$internal_ip${reset} *			${blue}RPi 4 = ${reset}$Raspi4_ifup"
-echo "* ${blue}Website = ${reset}$website_up *				${blue}RPi 5 = ${reset}$Raspi5_ifup"
-echo "* ${blue}Uptime = ${reset}$uptime 				${blue}RPi 6 = ${reset}$Raspi6_ifup"
-echo "* ${blue}OS = ${reset}"$(cat /etc/issue.net)"                    	${blue}Server = ${reset}$Server_ifup"
+echo "* ${blue}Systems Menu${reset} *				"
+echo "* ${blue}Domain IP = ${reset}$DOMAIN_IP *"
+echo "* ${blue}Public IP = ${reset}$public_ip *" 
+echo "* ${blue}Laptop IP = ${reset}${green}$internal_ip${reset} *"
+echo "* ${blue}Website = ${reset}$website_up *"
+echo "* ${blue}Uptime = ${reset}$uptime"
+echo "* ${blue}OS = ${reset}"$(cat /etc/issue.net)""
 echo "* ${blue}Remote Storage -${green} 
 $df_websites${reset}"
 echo "******************************************************************"
@@ -113,7 +75,7 @@ case $yourch in
 2) nemo sftp://$USER@192.168.0.4/media/Software/Downloads/ ;;
 3) ./KodiRepo/Menu ;;
 4) ssh -X $USER@192.168.0.4 pyrenamer ;;
-5) /home/iainstott/.bin/ddusb & ;;
+5) sh /home/iainstott/Scripts/backend/ddusb & ;;
 6)  ;;
 7)  ;;
 8) ssh iainstott@${server} sudo pm-hibernate ;;
