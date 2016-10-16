@@ -125,7 +125,7 @@ case "$ANS1" in
 					zenity --info --text "Operating System File not selected"
 			else
 				zenity --info --text "Writing "${FILE}" to "${DRIVE}
-				sudo pv "${FILE}" | sudo dd of="${DRIVE}" bs=1M
+				terminator -T "Writing USB Now" -e "sudo pv "${FILE}" | sudo dd of="${DRIVE}" bs=1M"
 				zenity --info --text "Flashing Complete"
 			fi
 		fi
@@ -153,7 +153,7 @@ case "$ANS1" in
 			"10 x32")
 				FILE=${tenx32}
 				;;
-			"10 x32")
+			"10 x64")
 				FILE=${tenx64}
 				;;	
 			"Linux Mint 18 Mate x32")

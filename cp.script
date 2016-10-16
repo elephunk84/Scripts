@@ -1,3 +1,0 @@
-#!/bin/bash
-#
-cp /Users/iainstott/Downloads/*.torrent sftp://iainstott@192.168.0.100/Documents/torrents

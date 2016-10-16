@@ -1,9 +1,0 @@
-#!/bin/bash
-cd ~/Library/Application\ Support/Kodi/userdata/addon_data/script.renegadestv/
-name=$( cat ./name.txt )
-name2=${name:1:${#name}-2}
-url=$( cat ./url.txt )
-url2=${url:1:${#url}-2}
-fav_name='favourite name="'$name2'"'
-echo "<$fav_name thumb=\"\">PlayMedia(&quot;$url2&amp;name=BT+Sports+1&amp;iconimage=http%3A%2F%2Fsport.bt.com%2Fimages%2Fbt-sport-1-logo-136381974803410401-130801120118.jpg&amp;description=&amp;sf_options=winID%3D10001%26_options_sf&quot;)</favourite>" >> ./favourites.xml.temp
-echo "" >> ./favourites.xml.temp

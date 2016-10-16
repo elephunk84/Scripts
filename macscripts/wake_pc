@@ -1,3 +1,0 @@
-#!/bin/bash
-wakeonlan E0:CB:4E:DE:D0:87
-osascript -e 'tell application "Terminal" to quit'
