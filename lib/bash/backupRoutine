@@ -49,8 +49,12 @@ function backupRoutine_GitRepo {
     for i in $( ls ); 
     do
         case $i in
-        "wiringpi")
+        "wiringPi")
             echo "wiringpi Not Running..."
+            return 1
+            ;;
+        "Twitter")
+            echo "Twitter Not Running..."
             return 1
             ;;
         esac
