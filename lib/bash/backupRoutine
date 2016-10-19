@@ -43,7 +43,7 @@ function backupRoutine_RASPI6 {
 function backupRoutine_RASPI7 {
     ${command} ${raspi7[2]}@${raspi7[0]}:/ ${NFSShare}/${raspi7[1]}${daily}
 }
-function backupRoutine_GitRepo {
+function backupRoutine_backupGitRepo {
     ssh pi@${raspi4[0]} "screen -X -S heating quit"
     cd ${GitRepo}
     for i in $( ls ); 
@@ -162,7 +162,7 @@ function backupRoutine_backupWEEKLY {
 
     
 function backupRoutine_backupGUI {
-    serverList=$(zenity --list --text "Resource To Backup." --height=400 --width=400 --checklist --column "Pick" --column "options" FALSE "All" FALSE "${raspi1[1]}" FALSE "${raspi2[1]}" FALSE "${raspi3[1]}" FALSE "${raspi4[1]}" FALSE "${raspi6[1]}" FALSE "${raspi7[1]}" FALSE "NFS-Backup-Drive" FALSE "Backup-Local-Drive-To-EntServer")
+    serverList=$(zenity --list --text "Resource To Backup." --height=400 --width=400 --checklist --column "Pick" --column "options" FALSE "All" FALSE "${raspi1[1]}" FALSE "${raspi2[1]}" FALSE "${raspi3[1]}" FALSE "${raspi4[1]}" FALSE "${raspi6[1]}" FALSE "${raspi7[1]}" FALSE "GitRepo" FALSE "NFS-Backup-Drive" FALSE "Backup-Local-Drive-To-EntServer")
     array=(${serverList//|/ })
     for i in "${array[@]}"
         do
@@ -187,6 +187,9 @@ function backupRoutine_backupGUI {
                 ;;
             "${raspi7[1]}")
                 backupRoutine_RASPI7
+                ;;
+            "GitRepo")
+                backupRoutine_backupGitRepo
                 ;;
             "NFS-Backup-Drive")
                 backupRoutine_backupNFSShare
