@@ -3,19 +3,20 @@
 # Script to perform some common system operations
 #
 
+cd ~/GitRepo/Scripts
 shopt -s expand_aliases
 source ~/.bashrc
+source ./lib/bash/ddusb
 
 echo "Loading please wait...."
 red=`tput setaf 1`
 green=`tput setaf 2`
 blue=`tput setaf 6`
 reset=`tput sgr0`
-cd ~/GitRepo/Scripts
-export raspi1="192.168.0.4" 
+export raspi1="192.168.1.1" 
 export raspi2="192.168.1.2" 
 export raspi3="192.168.1.3"  
-export raspi5="192.168.1.5" 
+export raspi4="192.168.1.4" 
 export raspi6="192.168.0.130"
 export raspi7="192.168.0.131"
 export server1_1="192.168.0.2"  
@@ -23,11 +24,11 @@ export server1_2="192.168.0.3"
 export server2_1="192.168.0.5"
 export server2_2="192.168.0.6" 
 export server_mac="F0:4D:A2:DB:E0:D8"
-declare ip_address=("$raspi1" "$raspi2" "$raspi3" "$raspi5" "$raspi6" "$raspi7" "$server1_1" "$server1_2" "$server2_1" "$server2_2")
+declare ip_address=("$raspi1" "$raspi2" "$raspi3" "$raspi4" "$raspi6" "$raspi7" "$server1_1" "$server1_2" "$server2_1" "$server2_2")
 for i in "${ip_address[@]}"
 do
   case $i in
-	192.168.0.4)
+	192.168.1.1)
 		name=Raspi1
 		;;
 	192.168.1.2)
@@ -36,8 +37,8 @@ do
 	192.168.1.3)
 		name=Raspi3
 		;;
-	192.168.1.5)
-		name=Raspi5
+	192.168.1.4)
+		name=Raspi4
 		;;
 	192.168.0.130)
 		name=Raspi6
@@ -69,7 +70,7 @@ export PUBLIC_IP=$my_ip
 export internal_ip=$(hostname -I)
 export iaincstott_ip=$(dig +short iaincstott.co.uk @resolver1.opendns.com)
 export domain_ip=$iaincstott_ip
-website_up=$(./Scripts/backend/website_ifup)
+website_up=$(./lib/bash/website_ifup)
 uptime=$(  uptime | tr "," " " | cut -f4-5 -d" ")
 df_websites=$(df -H / /media/Backup_NET/ /media/Software_NET/ /media/Websites_NET/ /media/Data_Drive/ /media/Storage_Drive/ /media/Backup_Drive/)
 if [ $domain_ip == $PUBLIC_IP ]; then 
@@ -85,17 +86,17 @@ fi
 while :
 do
 clear
-echo "******************************************************************"
+echo "**************************************************************************************************************"
 echo "* ${blue}Systems Menu${reset} *				"
 echo "* ${blue}Local IP = ${reset}${green}$internal_ip${reset} *"
-echo "* ${blue}Domain IP = ${reset}$DOMAIN_IP 			Rpi-1 = $Raspi1_ifup 		Rpi-5 = $Raspi6_ifup"
+echo "* ${blue}Domain IP = ${reset}$DOMAIN_IP 			Rpi-1 = $Raspi1_ifup 		Rpi-6 = $Raspi6_ifup"
 echo "* ${blue}Public IP = ${reset}$public_ip 			Rpi-2 = $Raspi2_ifup 		Rpi-7 = $Raspi7_ifup" 
 echo "* ${blue}Website = ${reset}$website_up 				Rpi-3 = $Raspi3_ifup 		Server 1 = $Server1_1_ifup"
-echo "* ${blue}Uptime = ${reset}$uptime				Rpi-5 = $Raspi5_ifup			Server 2 = $Server2_1_ifup"
+echo "* ${blue}Uptime = ${reset}$uptime				Rpi-4 = $Raspi4_ifup			Server 2 = $Server2_1_ifup"
 echo "* ${blue}OS = ${reset}"$(cat /etc/issue.net)""
 echo "* ${blue}Remote Storage -${green} 
 $df_websites${reset}"
-echo "******************************************************************"
+echo "**************************************************************************************************************"
 echo "* [1] Backup Scripts"
 echo "* [2] Edit Config Files"
 echo "* [3] Servers Menu"
@@ -109,14 +110,14 @@ echo "* "
 echo "* [u] Update Git Repos"
 echo "* [r] Reload Menu"
 echo "* [x] Exit/Stop *"
-echo "******************************************************************"
+echo "**************************************************************************************************************"
 echo "Enter your menu choice [1-0]: "
 read yourch
 case $yourch in
-1) terminator -e "sh /home/iainstott/Scripts/lib/bash/backupscript" &  ;;
-2) terminator -e "sh /home/iainstott/Scripts/lib/bash/editconfigfiles" &  ;;
+1) backupGUI ;;
+2) ;;
 3) terminator -e "sh /home/iainstott/Scripts/lib/bash/serversmenu" &  ;;
-4) terminator -e "sh /home/iainstott/Scripts/lib/bash/ddusb" & ;;
+4) burnISOGUI ;;
 5) terminator -e "sh /home/iainstott/Scripts/lib/bash/flasharduino" & ;;
 6)  ;;
 7)  ;;
@@ -124,8 +125,7 @@ case $yourch in
 9) wakeonlan $server_mac ;;
 u) cd /home/iainstott/GitRepo/ && for i in $( ls ); do cd $i; echo "Repository = "$i; git-update; echo ""; cd /home/iainstott/GitRepo; done ;;
 s) sh ./Scripts/backend/secret.script ;;
-r) sh ./Scripts/Menu ;;
-s2) sh ./Scripts/backend/secret2.script ;;
+r) sh ./Menu ;;
 x) exit 0;;
 *) echo "Oopps!!! Please select choice 1,2,3 or 4";
 echo "Press Enter to continue. . ." ; read ;;

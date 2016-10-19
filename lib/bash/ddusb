@@ -1,6 +1,7 @@
 #!/bin/bash
 #!/bin/sh
-storage_dir=/media/Data_Drive/ISO_Images
+
+storage_dir=/media/Data_Drive/Storage/Live_ISO_Images
 
 plop=${storage_dir}/plop.iso
 mintx32=${storage_dir}/mintx32.iso
@@ -23,6 +24,7 @@ tenx64="${storage_dir}/10x64.iso"
 
 NULL=/dev/null
 
+function burnISOGUI {
 ANS1=$(zenity  --list  --text "Type Of Installation" --radiolist  --column "Pick" --column "Type" TRUE "USB and SD Memory" FALSE "CD and DVD Disc")
 
 case "$ANS1" in
@@ -189,6 +191,6 @@ case "$ANS1" in
 			fi
 			;;
 	esac
-
+}
 
 

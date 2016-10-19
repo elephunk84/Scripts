@@ -1,0 +1,182 @@
+#!/bin/bash
+
+daily="/daily/"
+archive="/archive/"
+backupDir="/media/Backup_Drive/"
+backupDir2="/media/Data_Drive/Backup/"
+softwareDir="/media/Data_Drive/Storage/"
+NFSShare="/media/Backup_NET/"
+NFSSoftware="/media/Software_NET/"
+GitRepo="/media/Backup_NET/GitRepo/"
+
+raspi1=("192.168.0.4" "Raspi-1" "iainstott") 
+raspi2=("192.168.1.2" "Raspi-2" "root")
+raspi3=("192.168.1.3" "Raspi-3" "root")
+raspi4=("192.168.1.4" "Raspi-4" "root")
+raspi6=("192.168.0.130" "Raspi-6" "root")
+raspi7=("192.168.0.131" "Raspi-7" "root")
+server1=("192.168.0.2" "Server-1" "root")
+server2=("192.168.0.5" "Server-2" "root")
+
+declare machines=( "${raspi1[0]}" "${raspi2[0]}" "${raspi3[0]}" "${raspi4[0]}" "${raspi6[0]}" "${raspi7[0]}")
+
+command="rsync -aHv --delete-during --exclude-from=/home/iainstott/GitRepo/Scripts/lib/rsync_exclude.txt "
+
+THRESHOLD=$(date -d "46 days ago" +%d-%m-%Y_%H:%M)
+DELETE_OTHERS="yes"
+
+function backupRoutine_RASPI1 {
+    ${command} ${raspi1[2]}@${raspi1[0]}:/ ${NFSShare}/${raspi1[1]}${daily}
+}
+function backupRoutine_RASPI2 {
+    ${command} ${raspi2[2]}@${raspi2[0]}:/ ${NFSShare}/${raspi2[1]}${daily}
+}
+function backupRoutine_RASPI3 {
+    ${command} ${raspi3[2]}@${raspi3[0]}:/ ${NFSShare}/${raspi3[1]}${daily}
+}
+function backupRoutine_RASPI4 {
+    ${command} ${raspi4[2]}@${raspi4[0]}:/ ${NFSShare}/${raspi4[1]}${daily}
+}
+function backupRoutine_RASPI6 {
+    ${command} ${raspi6[2]}@${raspi6[0]}:/ ${NFSShare}/${raspi6[1]}${daily}
+    }
+function backupRoutine_RASPI7 {
+    ${command} ${raspi7[2]}@${raspi7[0]}:/ ${NFSShare}/${raspi7[1]}${daily}
+}
+function backupRoutine_GitRepo {
+    ssh pi@${raspi4[0]} "screen -X -S heating quit"
+    cd ${GitRepo}
+    for i in $( ls ); 
+    do
+        cd ${i}
+        echo ${i}
+        git add --all
+        git commit -m "backupRoutine"
+        git push origin master
+        cd ${GitRepo}
+    done
+    ssh pi@${raspi4[0]} "sh /home/pi/GitRepo/centralheating/run_me_on_boot.sh"
+}
+
+function backupRoutine_backupNFSShare {
+    ${command} ${NFSShare} ${backupDir}
+    ${command} ${NFSShare} ${backupDir2}
+}
+function backupRoutine_backupSoftwareNET {
+    ${command} ${NFSSoftware} ${softwareDir}
+}
+
+function backupRoutine_backupRPIS {
+    backupRoutine_RASPI1
+    backupRoutine_RASPI2
+    backupRoutine_RASPI3
+    backupRoutine_RASPI4
+    backupRoutine_RASPI6
+    backupRoutine_RASPI7
+}
+function backupRoutine_backupDAILY {
+    backupRoutine_backupRPIS
+    backupRoutine_backupNFSShare
+    backupRoutine_backupSoftwareNET   
+}
+
+function backupRoutine_removeOLD {
+    find ${BACKUPS_PATH} -maxdepth 1 -type f -print0  | while IFS= read -d '' -r file
+    do
+    if [[ "$(basename "$file")" =~ ^[0-9]{12}.tgz$ ]]; then
+        [ "$(basename "$file" .tgz)" -le "$THRESHOLD" ] && rm -v -- "$file"
+    else
+        [ $DELETE_OTHERS == "yes" ] && rm -v -- "$file"
+    fi
+    done
+}
+
+function backupRoutine_backupWEEKLY {
+    #backupRoutine_backupDAILY
+    date=$(date +%d-%m-%Y_%H:%M)
+    cd ${backupDir}
+    for i in "${machines[@]}"
+        do
+        case $i in
+            192.168.1.1)
+                name="${raspi1[1]}"
+                BACKUPS_PATH="${name}${archive}"
+                DAILY_PATH="${name}${daily}"
+                ;;
+            192.168.1.2)
+                name="${raspi2[1]}"
+                BACKUPS_PATH="${name}${archive}"
+                DAILY_PATH="${name}${daily}"
+                ;;
+            192.168.1.3)
+                name="${raspi3[1]}"
+                BACKUPS_PATH="${name}${archive}"
+                DAILY_PATH="${name}${daily}"
+                ;;
+            192.168.1.4)
+                name="${raspi4[1]}"
+                BACKUPS_PATH="${name}${archive}"
+                DAILY_PATH="${name}${daily}"
+                ;;
+            192.168.0.130)
+                name="${raspi6[1]}"
+                BACKUPS_PATH="${name}${archive}"
+                DAILY_PATH="${name}${daily}"
+                ;;
+            192.168.0.131)
+                name="${raspi7[1]}"
+                BACKUPS_PATH="${name}${archive}"
+                DAILY_PATH="${name}${daily}"
+                ;;
+            192.168.0.2)
+                name="${raspi1[1]}"
+                BACKUPS_PATH="${name}${archive}"
+                DAILY_PATH="${name}${daily}"
+                ;;
+            192.168.0.5)
+                name="${raspi1[1]}"
+                BACKUPS_PATH="${name}${archive}"
+                DAILY_PATH="${name}${daily}"
+                ;;
+        esac
+        backupRoutine_removeOLD
+        tar -zcvf ${BACKUPS_PATH}${date}.tgz ./${DAILY_PATH}
+    done
+}
+        
+
+
+    
+function backupRoutine_backupGUI {
+    serverList=$(zenity --list --text "Resource To Backup." --height=400 --width=400 --checklist --column "Pick" --column "options" FALSE "All" FALSE "${raspi1[1]}" FALSE "${raspi2[1]}" FALSE "${raspi3[1]}" FALSE "${raspi4[1]}" FALSE "${raspi6[1]}" FALSE "${raspi7[1]}" FALSE "NFS-Backup-Drive" FALSE "Backup-Local-Drive-To-EntServer")
+    array=(${serverList//|/ })
+    for i in "${array[@]}"
+        do
+          case $i in
+            "All")
+                backupRoutine_backupDAILY
+                ;;
+            "${raspi1[1]}")
+                backupRoutine_RASPI1
+                ;;
+            "${raspi2[1]}")
+                backupRoutine_RASPI2
+                ;;
+            "${raspi3[1]}")
+                backupRoutine_RASPI3
+                ;;
+            "${raspi4[1]}")
+                backupRoutine_RASPI4
+                ;;
+            "${raspi6[1]}")
+                backupRoutine_RASPI6
+                ;;
+            "${raspi7[1]}")
+                backupRoutine_RASPI7
+                ;;
+            "NFS-Backup-Drive")
+                backupRoutine_backupNFSShare
+                ;;
+            esac
+        done
+    }

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+export raspi1="root@192.168.0.4" 
+export raspi2="osmc@192.168.1.2" 
+export raspi3="root@192.168.1.3"  
+export raspi5="pi@192.168.1.5" 
+export raspi6="osmc@192.168.0.130"
+export raspi7="pi@192.168.0.131"
+export server1_1="root@192.168.0.2"  
+export server2_1="root@192.168.0.5"
+
+
