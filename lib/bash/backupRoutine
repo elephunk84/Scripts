@@ -8,6 +8,7 @@ softwareDir="/media/Data_Drive/Storage/"
 NFSShare="/media/Backup_NET/"
 NFSSoftware="/media/Software_NET/"
 GitRepo="/media/Backup_NET/GitRepo/"
+logsDir="${NFSShare}logs/"
 
 raspi1=("192.168.0.4" "Raspi-1" "iainstott") 
 raspi2=("192.168.1.2" "Raspi-2" "root")
@@ -20,28 +21,40 @@ server2=("192.168.0.5" "Server-2" "root")
 
 declare machines=( "${raspi1[0]}" "${raspi2[0]}" "${raspi3[0]}" "${raspi4[0]}" "${raspi6[0]}" "${raspi7[0]}")
 
-command="rsync -aHv --delete-during --exclude-from=/home/iainstott/GitRepo/Scripts/lib/rsync_exclude.txt "
+command="rsync -aAXHv --delete-during --exclude-from=/home/iainstott/GitRepo/Scripts/lib/rsync_exclude.txt "
 
 THRESHOLD=$(date -d "46 days ago" +%d-%m-%Y_%H:%M)
 DELETE_OTHERS="yes"
 
 function backupRoutine_RASPI1 {
-    ${command} ${raspi1[2]}@${raspi1[0]}:/ ${NFSShare}/${raspi1[1]}${daily}
+    echo "Now processing Raspi-1"
+    touch ${logsDir}${raspi1[1]}_${date}.log
+    ${command} --log-file=${logsDir}${raspi1[1]}_${date}.log ${raspi1[2]}@${raspi1[0]}:/ ${NFSShare}/${raspi1[1]}${daily} 2>&1 >/dev/null
 }
 function backupRoutine_RASPI2 {
-    ${command} ${raspi2[2]}@${raspi2[0]}:/ ${NFSShare}/${raspi2[1]}${daily}
+    echo "Now processing Raspi-2"
+    touch ${logsDir}${raspi2[1]}_${date}.log
+    ${command} --log-file=${logsDir}${raspi2[1]}_${date}.log ${raspi2[2]}@${raspi2[0]}:/ ${NFSShare}/${raspi2[1]}${daily} 2>&1 >/dev/null
 }
 function backupRoutine_RASPI3 {
-    ${command} ${raspi3[2]}@${raspi3[0]}:/ ${NFSShare}/${raspi3[1]}${daily}
+    echo "Now processing Raspi-3"
+    touch ${logsDir}${raspi3[1]}_${date}.log
+    ${command} --log-file=${logsDir}${raspi3[1]}_${date}.log ${raspi3[2]}@${raspi3[0]}:/ ${NFSShare}/${raspi3[1]}${daily} 2>&1 >/dev/null
 }
 function backupRoutine_RASPI4 {
-    ${command} ${raspi4[2]}@${raspi4[0]}:/ ${NFSShare}/${raspi4[1]}${daily}
+    echo "Now processing Raspi-4"
+    touch ${logsDir}${raspi4[1]}_${date}.log
+    ${command} --log-file=${logsDir}${raspi4[1]}_${date}.log ${raspi4[2]}@${raspi4[0]}:/ ${NFSShare}/${raspi4[1]}${daily} 2>&1 >/dev/null
 }
 function backupRoutine_RASPI6 {
-    ${command} ${raspi6[2]}@${raspi6[0]}:/ ${NFSShare}/${raspi6[1]}${daily}
+    echo "Now processing Raspi-6"
+    touch ${logsDir}${raspi6[1]}_${date}.log
+    ${command} --log-file=${logsDir}${raspi6[1]}_${date}.log ${raspi6[2]}@${raspi6[0]}:/ ${NFSShare}/${raspi6[1]}${daily} 2>&1 >/dev/null
     }
 function backupRoutine_RASPI7 {
-    ${command} ${raspi7[2]}@${raspi7[0]}:/ ${NFSShare}/${raspi7[1]}${daily}
+    echo "Now processing Raspi-7"
+    touch ${logsDir}${raspi7[1]}_${date}.log
+    ${command} --log-file=${logsDir}${raspi7[1]}_${date}.log ${raspi7[2]}@${raspi7[0]}:/ ${NFSShare}/${raspi7[1]}${daily} 2>&1 >/dev/null
 }
 function backupRoutine_backupGitRepo {
     ssh pi@${raspi4[0]} "screen -X -S heating quit"
@@ -73,14 +86,20 @@ function backupRoutine_backupGitRepo {
 }
 
 function backupRoutine_backupNFSShare {
-    ${command} ${NFSShare} ${backupDir}
-    ${command} ${NFSShare} ${backupDir2}
+    echo "Now processing NFSShare"
+    touch ${logsDir}NFSSHARE_${date}.log
+    touch ${logsDir}BACKUP_${date}.log
+    ${command} --log-file=${logsDir}NFSSHARE_${date}.log ${NFSShare} ${backupDir} 2>&1 >/dev/null
+    ${command} --log-file=${logsDir}BACKUP_${date}.log ${NFSShare} ${backupDir2} 2>&1 >/dev/null
 }
 function backupRoutine_backupSoftwareNET {
-    ${command} ${NFSSoftware} ${softwareDir}
+    echo "Now processing NFSSoftware"
+    touch ${logsDir}NFSSoftware_${date}.log
+    ${command} --log-file=${logsDir}NFSSoftware_${date}.log ${NFSSoftware} ${softwareDir} 2>&1 >/dev/null
 }
 
 function backupRoutine_backupRPIS {
+    date=$(date +%d-%m-%Y_%H:%M)
     backupRoutine_RASPI1
     backupRoutine_RASPI2
     backupRoutine_RASPI3
@@ -90,8 +109,12 @@ function backupRoutine_backupRPIS {
 }
 function backupRoutine_backupDAILY {
     backupRoutine_backupRPIS
-    backupRoutine_backupNFSShare
-    backupRoutine_backupSoftwareNET   
+    echo "Now processing GitRepo"
+    backupRoutine_backupGitRepo >> ${logsDir}GitRepo_${date}.log
+    echo "Now processing NFS Backup"
+    backupRoutine_backupNFSShare >> ${logsDir}NFSShare_${date}.log
+    echo "Now processing NFS Software"
+    backupRoutine_backupSoftwareNET >> ${logsDir}Software_${date}.log
 }
 
 function backupRoutine_removeOLD {
@@ -106,9 +129,8 @@ function backupRoutine_removeOLD {
 }
 
 function backupRoutine_backupWEEKLY {
-    #backupRoutine_backupDAILY
-    date=$(date +%d-%m-%Y_%H:%M)
-    cd ${backupDir}
+    backupRoutine_backupDAILY
+    cd ${NFSShare}
     for i in "${machines[@]}"
         do
         case $i in
