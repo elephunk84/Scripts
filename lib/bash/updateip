@@ -1,6 +1,0 @@
-#!/bin/bash
-cd ~/OneDrive/Dev/Scripts/backend/
-ip=$(dig +short myip.opendns.com @resolver1.opendns.com)
-rm -rf ./IAINCSTOTT_DOMAIN_IP
-touch ./IAINCSTOTT_DOMAIN_IP
-echo $ip >> ./IAINCSTOTT_DOMAIN_IP

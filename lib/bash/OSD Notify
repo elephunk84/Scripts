@@ -1,2 +1,0 @@
-#!/bin/bash
-ssh -X user@host 'DISPLAY=:0 notify-send "TEST MESSAGE."'

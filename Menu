@@ -3,66 +3,63 @@
 # Script to perform some common system operations
 #
 
+echo "Loading please wait...."
+
 cd ~/GitRepo/Scripts
 shopt -s expand_aliases
 source ~/.bashrc
-source ./lib/bash/ddusb
+source ./lib/bash/burnISO
+source ./lib/bash/editFiles
+source ./lib/bash/otherScripts
 
-echo "Loading please wait...."
 red=`tput setaf 1`
 green=`tput setaf 2`
 blue=`tput setaf 6`
 reset=`tput sgr0`
-export raspi1="192.168.1.1" 
-export raspi2="192.168.1.2" 
-export raspi3="192.168.1.3"  
-export raspi4="192.168.1.4" 
-export raspi6="192.168.0.130"
-export raspi7="192.168.0.131"
-export server1_1="192.168.0.2"  
-export server1_2="192.168.0.3"
-export server2_1="192.168.0.5"
-export server2_2="192.168.0.6" 
-export server_mac="F0:4D:A2:DB:E0:D8"
-declare ip_address=("$raspi1" "$raspi2" "$raspi3" "$raspi4" "$raspi6" "$raspi7" "$server1_1" "$server1_2" "$server2_1" "$server2_2")
+
+MENU_raspi1=("192.168.0.4" "Raspi1" "iainstott" "192.168.1.1") 
+MENU_raspi2=("192.168.1.2" "Raspi2" "root")
+MENU_raspi3=("192.168.1.3" "Raspi3" "root")
+MENU_raspi4=("192.168.1.4" "Raspi4" "root")
+MENU_raspi6=("192.168.0.130" "Raspi6" "root")
+MENU_raspi7=("192.168.0.131" "Raspi7" "root")
+MENU_server1=("localhost" "Server1" "root" "192.168.0.3")
+MENU_server2=("192.168.0.5" "Server2" "root" "F0:4D:A2:DB:E0:D8" "192.168.0.6")
+
+declare ip_address=("${MENU_raspi1[0]}" "${MENU_raspi2[0]}" "${MENU_raspi3[0]}" "${MENU_raspi4[0]}" "${MENU_raspi6[0]}" "${MENU_raspi7[0]}" "${MENU_server1[0]}" "${MENU_server2[0]}")
+
 for i in "${ip_address[@]}"
 do
   case $i in
-	192.168.1.1)
-		name=Raspi1
+	${MENU_raspi1[0]})
+		name=${MENU_raspi1[1]}
 		;;
-	192.168.1.2)
-		name=Raspi2
+	${MENU_raspi2[0]})
+		name=${MENU_raspi2[1]}
 		;;
-	192.168.1.3)
-		name=Raspi3
+	${MENU_raspi3[0]})
+		name=${MENU_raspi3[1]}
 		;;
-	192.168.1.4)
-		name=Raspi4
+	${MENU_raspi4[0]})
+		name=${MENU_raspi4[1]}
 		;;
-	192.168.0.130)
-		name=Raspi6
+	${MENU_raspi6[0]})
+		name=${MENU_raspi6[1]}
 		;;
-	192.168.0.131)
-		name=Raspi7
+	${MENU_raspi7[0]})
+		name=${MENU_raspi7[1]}
 		;;
-	192.168.0.2)
-		name=Server1_1
+	${MENU_server1[0]})
+		name=${MENU_server1[1]}
 		;;
-	192.168.0.3)
-		name=Server1_2
-		;;
-	192.168.0.5)
-		name=Server2_1
-		;;
-	192.168.0.6)
-		name=Server2_2
+	${MENU_server2[0]})
+		name=${MENU_server2[1]}
 		;;
 	esac
   if ping -c 1 $i > /dev/null ; then
 	export ${name}_ifup="${green}On-Line${reset}"
   else
-   export ${name}_ifup="${red}Off-Line${reset}"
+    export ${name}_ifup="${red}Off-Line${reset}"
   fi
 done
 export my_ip=$(dig +short myip.opendns.com @resolver1.opendns.com)
@@ -70,7 +67,7 @@ export PUBLIC_IP=$my_ip
 export internal_ip=$(hostname -I)
 export iaincstott_ip=$(dig +short iaincstott.co.uk @resolver1.opendns.com)
 export domain_ip=$iaincstott_ip
-website_up=$(./lib/bash/website_ifup)
+website_up=$(./lib/bash/otherScripts; websiteCHECK)
 uptime=$(  uptime | tr "," " " | cut -f4-5 -d" ")
 df_websites=$(df -H / /media/Backup_NET/ /media/Software_NET/ /media/Websites_NET/ /media/Data_Drive/ /media/Storage_Drive/ /media/Backup_Drive/)
 if [ $domain_ip == $PUBLIC_IP ]; then 
@@ -83,26 +80,35 @@ if [ $domain_ip == $PUBLIC_IP ]; then
 else
 	export public_ip="${red}$PUBLIC_IP${reset}"
 fi
+
+function bladeSever_STATE {
+	if [ ${Server2_ifup} == "${red}Off-Line${reset}" ] > /dev/null ; then
+		sudo ether-wake f0:4d:a2:db:e0:d8
+	else
+		ssh ${MENU_server2[3]}@${MENU_server2[0]} "sudo shutdown -now"
+	fi
+}
+
 while :
 do
 clear
-echo "**************************************************************************************************************"
+echo "${blue}**************************************************************************************************************"
 echo "* ${blue}Systems Menu${reset} *				"
 echo "* ${blue}Local IP = ${reset}${green}$internal_ip${reset} *"
 echo "* ${blue}Domain IP = ${reset}$DOMAIN_IP 			Rpi-1 = $Raspi1_ifup 		Rpi-6 = $Raspi6_ifup"
 echo "* ${blue}Public IP = ${reset}$public_ip 			Rpi-2 = $Raspi2_ifup 		Rpi-7 = $Raspi7_ifup" 
-echo "* ${blue}Website = ${reset}$website_up 				Rpi-3 = $Raspi3_ifup 		Server 1 = $Server1_1_ifup"
-echo "* ${blue}Uptime = ${reset}$uptime				Rpi-4 = $Raspi4_ifup			Server 2 = $Server2_1_ifup"
+echo "* ${blue}Website = ${reset}$website_up 				Rpi-3 = $Raspi3_ifup 		Server 1 = $Server1_ifup"
+echo "* ${blue}Uptime = ${reset}$uptime				Rpi-4 = $Raspi4_ifup			Server 2 = $Server2_ifup"
 echo "* ${blue}OS = ${reset}"$(cat /etc/issue.net)""
 echo "* ${blue}Remote Storage -${green} 
 $df_websites${reset}"
-echo "**************************************************************************************************************"
+echo "${blue}**************************************************************************************************************"
 echo "* [1] Backup Scripts"
 echo "* [2] Edit Config Files"
 echo "* [3] Servers Menu"
 echo "* [4] Burn ISO"
 echo "* [5] Flash Arduino"
-echo "* [6] Kodi Tools"
+echo "* [6] Vitrualization Tools"
 echo "* [7] Kill App"
 echo "* [8] Sleep or Wake BaldeServer"
 echo "* [9] "
@@ -110,19 +116,19 @@ echo "* "
 echo "* [u] Update Git Repos"
 echo "* [r] Reload Menu"
 echo "* [x] Exit/Stop *"
-echo "**************************************************************************************************************"
-echo "Enter your menu choice [1-0]: "
+echo "${blue}**************************************************************************************************************"
+echo "${blue}Enter your menu choice [1-0]: "
 read yourch
 case $yourch in
-1) backupGUI ;;
-2) ;;
-3) terminator -e "sh /home/iainstott/Scripts/lib/bash/serversmenu" &  ;;
+1) backupRoutine_backupGUI ;;
+2) editFiles_GUI;;
+3) ;;
 4) burnISOGUI ;;
-5) terminator -e "sh /home/iainstott/Scripts/lib/bash/flasharduino" & ;;
-6)  ;;
+5) ;;
+6) virtualizationTools_GUI ;;
 7)  ;;
-8) ssh iainstott@${server} sudo pm-hibernate ;;
-9) wakeonlan $server_mac ;;
+8) bladeSever_STATE ;;
+9) sudo  ether_wake ${server[2]} ;;
 u) cd /home/iainstott/GitRepo/ && for i in $( ls ); do cd $i; echo "Repository = "$i; git-update; echo ""; cd /home/iainstott/GitRepo; done ;;
 s) sh ./Scripts/backend/secret.script ;;
 r) sh ./Menu ;;

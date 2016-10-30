@@ -1,18 +1,124 @@
 #!/bin/bash
-BASE_DIR="/home/iainstott/Kodi"
+HOME_DIR="/home/iainstott"
+BASE_DIR=${HOME_DIR}"/Kodi"
 CURRENT_BUILD=${BASE_DIR}"/Current_Build"
 LAST_BUILD=${BASE_DIR}"/Last_Build"
-KODI_DIR="/home/iainstott/.kodi"
+KODI_DIR=${HOME_DIR}"/.kodi"
 KODI_ADDONS=${KODI_DIR}"/addons"
-GIT_REPO="/home/iainstott/GitRepo/Kodi-Addons"
+GIT_REPO=${HOME_DIR}"/GitRepo/Kodi-Addons"
 BUILD_ARCHIVE=${BASE_DIR}"/Archive"
 EXTRA_BUILD_ARCHIVE=${BUILD_ARCHIVE}"/Builds"
 ADDON_ARCHIVE=${BUILD_ARCHIVE}"/Addons"
 MY_ADDON_ARCHIVE=${ADDON_ARCHIVE}"/My_Addons"
+RSYNC_KODIREPO="pi@192.168.0.4:/media/Backup/Kodi"
+
+BACKUP_ZIP=${BASE_DIR}"/backup.zip"
+
+ADDONS=(plugin.video.iainstool script.ftvguide)
 
 BACKUP_ZIP=${BASE_DIR}"/backup.zip"
 TODAY=$(date +"%d/%m/%Y")
 BUILD=$(date +"%Y%m%d")
+
+function backup_build {
+    update_feeds
+    killall -9 kodi.bin >> /dev/null
+    echo "Deleting Last Build...."
+    rm -rf ${LAST_BUILD};
+    rm -rf ${BACKUP_ZIP}
+    remove_links
+    echo "Moving Current Build to Last Build...."
+    mv ${CURRENT_BUILD} ${LAST_BUILD};
+    mkdir ${CURRENT_BUILD};
+    echo "Copying Current Build...."
+    rsync -azh ${KODI_DIR}/ ${CURRENT_BUILD} >> /dev/null;
+    echo "Creating Archives...."
+    cd ${CURRENT_BUILD};
+    TIMESTAMP=$(date +"%Y:%m:%d_%H:%M")
+    FULLNAME="Iains_Build_"${TIMESTAMP}".zip"
+    zip -r --exclude=*.zip ${BUILD_ARCHIVE}/${FULLNAME} ./ >> /dev/null;
+    cp ${BUILD_ARCHIVE}/${FULLNAME} ${BACKUP_ZIP};
+    make_links
+    update_webserver
+}
+
+function backup_addons {
+    cmd=(dialog --separate-output --checklist "Select Addons:" 22 76 16)
+    options=(1 "Backup Iains Tool" off
+             2 "Backup FTV Guide" off)
+    choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
+    clear
+    for choice in $choices
+    do
+        case $choice in
+            1)
+                backup_iainstool
+                ;;
+            2)
+                backup_ftvguide
+                ;;
+        esac
+    done
+}
+
+function backup_iainstool {
+    cd ${GIT_REPO}
+    VERSION=( $(find ./plugin.video.iainstool -type f -name "*.zip") ) 
+    VER=( ${VERSION:2:50} )
+    SION=( ${VERSION:52:-4} )
+    SION=$((SION + 1))
+    FULLNAME=($VER$SION".zip")
+    rm -rf ${VERSION}
+    zip -r --exclude=*.zip  ${FULLNAME} ./plugin.video.iainstool >> /dev/null
+    cp ${FULLNAME} ${MY_ADDON_ARCHIVE}/${FULLNAME:23:}
+}
+
+function backup_ftvguide {
+    cd ${GIT_REPO}
+    VERSION=( $(find ./script.ftvguide -type f -name "*.zip") ) 
+    VER=( ${VERSION:2:36} )
+    SION=( ${VERSION:39:-4} )
+    SION=$((SION + 1))
+    FULLNAME=($VER$SION".zip")
+    rm -rf ${VERSION}
+    zip -r --exclude=*.zip  ${FULLNAME} ./script.ftvguide >> /dev/null
+    cp ${FULLNAME} ${MY_ADDON_ARCHIVE}/${FULLNAME:23:}
+    }
+
+function remove_links {
+    cd ${KODI_ADDONS}
+    for ADDON in ${ADDONS}; do
+        unlink ./${ADDON}
+        mkdir ./${ADDON}
+        cd ./${ADDON}
+        rsync -azh ${GIT_REPO}/${ADDON} .
+        cd ${KODI_ADDONS}
+        done
+}
+
+function make_links {
+    cd ${KODI_ADDONS}
+    for ADDON in ${ADDONS}; do
+        rm -rf ./${ADDON}
+        ln -s ${GIT_REPO}/${ADDON} ./
+        done
+}
+
+function backup_packages {
+    cp ${KODI_ADDONS}/packages/*.zip ${ADDON_ARCHIVE}
+}
+
+function update_webserver {
+      if zenity --question --title="Update to Webserver??" --text="Do you want to update to Webserver?"; then
+            if zenity --question --title="Update to Webserver??" --text="Do you want to run with delete option??"; then
+                  rsync -a --delete-before ${BASE_DIR} ${RSYNC_KODIREPO};
+            else
+                  rsync -a ${BASE_DIR} ${RSYNC_KODIREPO};
+            fi
+      else
+            pass
+      fi
+}
 
 function update_feeds {
     ###UDATE IAINSRSS

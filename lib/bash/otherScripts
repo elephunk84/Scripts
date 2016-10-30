@@ -1,0 +1,22 @@
+#!/bin/bash
+
+
+function websiteCHECK {
+	ifup=$(curl http://iaincstott.co.uk/index.html)
+	check=${#ifup}
+	if [ $check -ge 6 ]; then
+		status=UP
+	else
+		status=DOWN
+	fi
+	if [ $status = UP ]
+	then 
+		echo "${green}Online${reset}"
+	else
+		echo "${red}Offline${reset}"
+	fi
+}
+
+function onscreenNOTIFY {
+    ssh -X user@host 'DISPLAY=:0 notify-send "TEST MESSAGE."'
+}
