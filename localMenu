@@ -1,0 +1,22 @@
+#!/bin/bash
+
+homeLOCAL='/home/iainstott/'
+homeREMOTE='/mnt/Backup/Iains/Iains\ Laptop/'
+gitREPO='/mnt/Backup/GitRepo/'
+kodiLOCAL='/home/iainstott/.kodi/'
+kodiREMOTE='/mnt/Backup/Kodi/'
+
+function localMenuGUI {
+    date=$(date +%d-%m-%Y_%H:%M)
+    serverList=$(zenity --list --text "Local Machine Menu" --height=400 --width=400 --checklist --column "Pick" --column "options" FALSE "Backup Home Folder" FALSE "Install Program" FALSE "Kodi Menu" FALSE "Network Menu" FALSE "Restart Servers" FALSE "SSH Servers")
+    array=(${serverList//|/ })
+    for i in "${array[@]}"
+        do
+          case $i in
+            "Kodi Menu")
+                ;;
+            esac
+        done
+    }
+
+localMenuGUI
