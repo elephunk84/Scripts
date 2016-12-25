@@ -2,22 +2,13 @@
 
 daily="/daily/"
 archive="/archive/"
-backupDir="/media/Backup_Drive/"
 backupDir2="/media/Data_Drive/Backup/"
+backupDir="/media/Storage_Drive/Backup"
 softwareDir="/media/Data_Drive/Storage/"
 NFSShare="/media/Backup_NET/"
 NFSSoftware="/media/Software_NET/"
 GitRepo="/media/Backup_NET/GitRepo/"
 logsDir="${NFSShare}logs/"
-
-raspi1=("192.168.0.4" "Raspi-1" "iainstott") 
-raspi2=("192.168.1.2" "Raspi-2" "root")
-raspi3=("192.168.1.3" "Raspi-3" "root")
-raspi4=("192.168.1.4" "Raspi-4" "root")
-raspi6=("192.168.0.130" "Raspi-6" "root")
-raspi7=("192.168.0.131" "Raspi-7" "root")
-server1=("192.168.0.2" "Server-1" "root")
-server2=("192.168.0.5" "Server-2" "root")
 
 declare machines=( "${raspi1[0]}" "${raspi2[0]}" "${raspi3[0]}" "${raspi4[0]}" "${raspi6[0]}" "${raspi7[0]}")
 

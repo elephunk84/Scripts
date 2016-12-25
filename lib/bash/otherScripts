@@ -18,5 +18,5 @@ function websiteCHECK {
 }
 
 function onscreenNOTIFY {
-    ssh -X user@host 'DISPLAY=:0 notify-send "TEST MESSAGE."'
+    DISPLAY=:0 notify-send "$1"
 }

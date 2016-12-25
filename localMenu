@@ -1,22 +1,44 @@
 #!/bin/bash
 
+cd /home/iainstott/GitRepo/Scripts
+source ./lib/bash/machines
+source ./lib/bash/kodiScripts
+source ./lib/bash/backupRoutine
+source ./lib/bash/burnISO
+source ./lib/bash/otherScripts
 homeLOCAL='/home/iainstott/'
 homeREMOTE='/mnt/Backup/Iains/Iains\ Laptop/'
-gitREPO='/mnt/Backup/GitRepo/'
-kodiLOCAL='/home/iainstott/.kodi/'
-kodiREMOTE='/mnt/Backup/Kodi/'
+systemRemote='/mnt/Backup/Iains/Iains\ Laptop\ Full/'
 
 function localMenuGUI {
     date=$(date +%d-%m-%Y_%H:%M)
-    serverList=$(zenity --list --text "Local Machine Menu" --height=400 --width=400 --checklist --column "Pick" --column "options" FALSE "Backup Home Folder" FALSE "Install Program" FALSE "Kodi Menu" FALSE "Network Menu" FALSE "Restart Servers" FALSE "SSH Servers")
-    array=(${serverList//|/ })
-    for i in "${array[@]}"
-        do
-          case $i in
-            "Kodi Menu")
-                ;;
-            esac
-        done
+    choice=$(zenity --list --text "Local Machine Menu" --height=400 --width=400 --checklist --column "Pick" --column "options" FALSE "Backup Home Folder" FALSE "Backup System" FALSE "Install Program" FALSE "Kodi Menu" FALSE "Network Menu" FALSE "Restart Servers" FALSE "SSH Servers" FALSE "Burn USB ISO")
+    case $choice in
+		"Backup Home Folder")
+			xterm -e "rsync -aAXHv --delete-during ${homeLOCAL} ${homeREMOTE}"
+			;;
+		"Backup System")
+			xterm -e "rsync -aAXHv --delete-during --exclude-from=/home/iainstott/GitRepo/Scripts/lib/rsync_exclude.txt / ${systemRemote}"
+			;;
+		"Install Program")
+			PROGRAM=$(zenity --entry \
+							 --title="Install new program" \
+							 --text="Enter name of new program:" \
+							 --entry-text "program")
+			xterm -e "sudo pacman -S ${PROGRAM}"
+			;;
+		"Kodi Menu")
+			KODI_GUI
+			;;
+		"Burn USB ISO")
+			burnISOGUI
+			;;
+		"Network Menu")
+			terminator -p netMenu --geometry=900x530
+			;;
+		"Shutdown all Servers")
+			
+	esac
     }
 
 localMenuGUI

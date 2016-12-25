@@ -1,0 +1,31 @@
+#!/bin/bash
+
+homeLOCAL='/home/iainstott/'
+homeREMOTE='/mnt/Backup/Iains/Iains\ Laptop/'
+gitREPO='/mnt/Backup/GitRepo/'
+kodiLOCAL='/home/iainstott/.kodi/'
+kodiREMOTE='/mnt/Backup/Kodi/'
+
+function KODI_Backup {
+	xterm -e "rsync -aAXHv --delete-during ${kodiLOCAL} ${kodiREMOTE}currentBuild"
+	tar -zcvf ${kodiREMOTE}/backupFolder/BuildArchive/${date}.tgz ./${DAILY_PATH}
+
+}	
+	
+	
+function localMenuGUI {
+    date=$(date +%d-%m-%Y_%H:%M)
+    choice=$(zenity --list --text "Local Machine Menu" --height=400 --width=400 --checklist --column "Pick" --column "options" FALSE "Backup Home Folder" FALSE "Install Program" FALSE "Kodi Menu" FALSE "Network Menu" FALSE "Restart Servers" FALSE "SSH Servers")
+    case $choice in
+		"Kodi Menu")
+			action=$(zenity  --list --height=400 --width=600 --title="Kodi Menu" --text "Action To Run" --radiolist  --column "Pick" --column "Type" TRUE "Backup Build" )
+				case $action in
+					"Backup Build")
+						KODI_Backup
+						;;
+				esac
+			;;
+	esac
+    }
+
+localMenuGUI

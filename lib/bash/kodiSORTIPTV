@@ -1,0 +1,46 @@
+#!/bin/bash
+
+cd /home/iainstott/GitRepo/Scripts
+
+kodiHOME='/home/iainstott/.kodi/'
+kodiLOCAL='/home/iainstott/Kodi/'
+kodiLOCALCURRENT=${kodiLOCAL}"currentBuild/"
+kodiREMOTE='/mnt/Backup/Iains/KodiRepo/'
+kodiREMOTECURRENT=${kodiREMOTE}"currentBuild/"
+kodiRESET=${kodiLOCAL}"reset.tgz"
+kodiCURRENT=${kodiLOCAL}"current.tgz"
+kodiArchive=${kodiLOCAL}"backupFolder/BuildArchive/"
+IPTVM3U=${kodiLOCAL}"IPTVLists/IPTV.m3u"
+IPTVMYM3U=${kodiLOCAL}"IPTVLists/MYIPTV.m3u"
+IPTVfile=${kodiLOCAL}"IPTV.m3u"
+IPTVtempfile=${kodiLOCAL}"IPTVtemp.m3u"
+IPTVChannelFolder=${kodiLOCAL}"IPTVLists/Channels/"
+IPTVChannelList=${kodiLOCAL}"/IPTVLists/Channels.txt"
+
+rm -rf ${IPTVChannelList}
+touch ${IPTVChannelList}
+rm -rf ${IPTVChannelFolder}
+mkdir ${IPTVChannelFolder}
+
+DATE=$(date +%d-%m-%y)
+wget -O ${kodiLOCAL}"IPTVLists/Archive/${DATE}_1.m3u" "http://uk-mega-iptv.is-found.org:25461/get.php?username=IainStott&password=QAcEiPTJsK&type=m3u&output=ts"
+wget -O ${kodiLOCAL}"IPTVLists/Archive/${DATE}_2.m3u" "http://uk-mega-iptv.is-found.org:25461/get.php?username=IainStott2&password=QAcEiPTJsK&type=m3u&output=ts"
+cp ${kodiLOCAL}"IPTVLists/Archive/${DATE}-1.m3u" ${IPTVM3U}
+cp ${kodiLOCAL}"IPTVLists/Archive/${DATE}-2.m3u" ${IPTVMYM3U}
+cp ${IPTVM3U} ${IPTVfile}
+cp ${IPTVfile} ${IPTVtempfile}
+head -n 1 ${IPTVtempfile} > /dev/null && sed -i '1,+2d' ${IPTVtempfile}
+while [ -f ${IPTVtempfile} ]; do
+	firstLINE=$(head -n 1 ${IPTVtempfile})
+	if [ ${#firstLINE} -ge 1 ]
+	then
+		echo ${firstLINE}
+		name=${firstLINE##*|}
+		echo $name >> ${kodiLOCAL}/IPTVLists/Channels.txt
+		name=${name//[^[:alnum:]]/}
+		head -2 ${IPTVtempfile} > ${IPTVChannelFolder}${name}".m3u" && sed -i '1,+1d' ${IPTVtempfile}
+	else
+		rm -rf ${IPTVtempfile} 
+	fi
+done
+

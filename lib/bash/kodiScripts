@@ -1,0 +1,122 @@
+#!/bin/bash
+
+cd /home/iainstott/GitRepo/Scripts
+
+kodiHOME='/home/iainstott/.kodi/'
+kodiLOCAL='/home/iainstott/Kodi/'
+kodiLOCALCURRENT=${kodiLOCAL}"currentBuild/"
+kodiREMOTE='/mnt/Backup/Iains/KodiRepo/'
+kodiREMOTECURRENT=${kodiREMOTE}"currentBuild/"
+kodiRESET=${kodiLOCAL}"reset.tgz"
+kodiCURRENT=${kodiLOCAL}"current.tgz"
+kodiArchive=${kodiLOCAL}"backupFolder/BuildArchive/"
+
+kodiADDONS=(repository.elephunk84 plugin.program.iainstool)
+
+function KODI_UpdateGITREPO {
+	cd ${kodiLOCAL}
+	python ./generator.py
+	git add .
+	git commit -m "Auto Update"
+	git push -u origin master
+}
+
+function KODI_removeLinks {
+	cd ${kodiHOME}addons
+	    for ADDON in ${ADDONS}; do
+        unlink ./${ADDON}
+        mkdir ./${ADDON}
+        cd ./${ADDON}
+        rsync -azh ${kodiLOCAL}${ADDON} .
+        cd ${kodiHOME}addons
+        done
+}
+
+function KODI_makeLinks {
+    cd ${kodiHOME}addons/
+    for ADDON in ${ADDONS}; do
+        rm -rf ./${ADDON}
+        ln -s ${kodiHOME}${ADDON} ./
+        done
+}
+
+
+function KODI_Backup {
+	date=$(date +%d-%m-%Y_%H:%M)
+	KODI_removeLinks
+	cd ${kodiHOME}
+	rsync -aAXHv --delete-during ${kodiHOME} ${kodiLOCALCURRENT}
+	tar -zcf ${kodiArchive}${date}.tgz *
+    cd /home/iainstott/GitRepo/Scripts
+	action=$(zenity  --list --title="Kodi Menu" --text "Build Actions?" --checklist  --column "Pick" --column "Type" TRUE "Create Current")
+		case $action in
+			"Create Current")
+				cp ${kodiArchive}${date}.tgz ${kodiCURRENT}
+				;;
+		esac
+	rsync -aAXHv --delete-during ${kodiLOCAL} ${kodiREMOTE}
+	KODI_makeLinks
+	echo 'message:Backup Complete' | zenity --notification --listen
+}
+
+function KODI_SyncREMOTE {
+	action=$(zenity  --list --title="Kodi Menu" --text "Direction?" --radiolist  --column "Pick" --column "Type" TRUE "Local to Remote" FALSE "Remote to Local")
+		case $action in
+			"Local to Remote")
+				source=${kodiLOCAL}
+				destination=${kodiREMOTE}
+				;;
+			"Remote to Local")
+				source=${kodiREMOTE}
+				destination=${kodiLOCAL}
+				;;
+		esac
+	xterm -e "rsync -aAXHv --delete-during ${source} ${destination}"
+}
+
+function KODI_RestoreBUILD {
+	BACKUP=$(find /home/iainstott/Kodi/backupFolder/BuildArchive -mindepth 1 -maxdepth 1  -name "*.tgz" | sort | awk '{ printf "FALSE""\0"$0"\0" }' | xargs -0 zenity --list --height=400 --width=600 --title="Kodi Menu" --text="Choose a Backup to Restore" --radiolist --multiple --column ' ' --column 'Devices')
+	rm -rf ${kodiHOME} 
+	mkdir ${kodiHOME}
+	cd ${kodiHOME}
+	tar -xzf ${BACKUP}
+}
+
+function KODI_Reset {
+	rm -rf ${kodiHOME}
+	mkdir ${kodiHOME}
+	cd ${kodiHOME}
+	tar -xzf ${kodiRESET}
+}
+
+function KODI_CreateReset {
+	cd ${kodiHOME}
+	tar -zcvf ${kodiRESET} *
+}
+
+function KODI_GUI {
+	action=$(zenity  --list --height=400 --width=300 --title="Kodi Menu" --text "Action To Run" --radiolist  --column "Pick" --column "Type" TRUE "Backup Build" FALSE "Update GIT Repo" FALSE "Sort IPTV List" FALSE "Restore Build" FALSE "Reset Build" FALSE "Create Reset Archive" FALSE "Sync Remote Folders")
+	case $action in
+		"Backup Build")
+			KODI_Backup
+			;;
+		"Update GIT Repo")
+			KODI_UpdateGITREPO
+			;;
+		"Sort IPTV List")
+			/home/iainstott/GitRepo/Scripts/lib/bash/kodiSORTIPTV
+			;;
+		"Restore Build")
+			KODI_RestoreBUILD
+			;;
+		"Reset Build")
+			KODI_Reset
+			;;
+		"Create Reset Archive")
+			KODI_CreateReset
+			;;
+		"Sync Remote Folders")
+			KODI_SyncREMOTE
+			;;
+	esac
+}

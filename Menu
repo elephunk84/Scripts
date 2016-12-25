@@ -6,8 +6,8 @@
 echo "Loading please wait...."
 
 cd ~/GitRepo/Scripts
-shopt -s expand_aliases
 source ~/.bashrc
+source ./lib/bash/machines
 source ./lib/bash/burnISO
 source ./lib/bash/editFiles
 source ./lib/bash/otherScripts
@@ -17,45 +17,36 @@ green=`tput setaf 2`
 blue=`tput setaf 6`
 reset=`tput sgr0`
 
-export DISPLAY=:0
+export TERM=xterm
 
-MENU_raspi1=("192.168.0.4" "Raspi1" "iainstott" "192.168.1.1") 
-MENU_raspi2=("192.168.1.2" "Raspi2" "root")
-MENU_raspi3=("192.168.1.3" "Raspi3" "root")
-MENU_raspi4=("192.168.1.4" "Raspi4" "root")
-MENU_raspi6=("192.168.0.130" "Raspi6" "root")
-MENU_raspi7=("192.168.0.131" "Raspi7" "root")
-MENU_server1=("localhost" "Server1" "root" "192.168.0.3")
-MENU_server2=("192.168.0.5" "Server2" "root" "F0:4D:A2:DB:E0:D8" "192.168.0.6")
-
-declare ip_address=("${MENU_raspi1[0]}" "${MENU_raspi2[0]}" "${MENU_raspi3[0]}" "${MENU_raspi4[0]}" "${MENU_raspi6[0]}" "${MENU_raspi7[0]}" "${MENU_server1[0]}" "${MENU_server2[0]}")
+declare ip_address=("${raspi1[0]}" "${raspi2[0]}" "${raspi3[0]}" "${raspi4[0]}" "${raspi6[0]}" "${raspi7[0]}" "${server1[0]}" "${server2[0]}")
 
 for i in "${ip_address[@]}"
 do
   case $i in
-	${MENU_raspi1[0]})
-		name=${MENU_raspi1[1]}
+	${raspi1[0]})
+		name=${raspi1[1]}
 		;;
-	${MENU_raspi2[0]})
-		name=${MENU_raspi2[1]}
+	${raspi2[0]})
+		name=${raspi2[1]}
 		;;
-	${MENU_raspi3[0]})
-		name=${MENU_raspi3[1]}
+	${raspi3[0]})
+		name=${raspi3[1]}
 		;;
-	${MENU_raspi4[0]})
-		name=${MENU_raspi4[1]}
+	${raspi4[0]})
+		name=${raspi4[1]}
 		;;
-	${MENU_raspi6[0]})
-		name=${MENU_raspi6[1]}
+	${raspi6[0]})
+		name=${raspi6[1]}
 		;;
-	${MENU_raspi7[0]})
-		name=${MENU_raspi7[1]}
+	${raspi7[0]})
+		name=${raspi7[1]}
 		;;
-	${MENU_server1[0]})
-		name=${MENU_server1[1]}
+	${server1[0]})
+		name=${server1[1]}
 		;;
-	${MENU_server2[0]})
-		name=${MENU_server2[1]}
+	${server2[0]})
+		name=${server2[1]}
 		;;
 	esac
   if ping -c 1 $i > /dev/null ; then
@@ -87,7 +78,7 @@ function bladeSever_STATE {
 	if [ ${Server2_ifup} == "${red}Off-Line${reset}" ] > /dev/null ; then
 		sudo ether-wake f0:4d:a2:db:e0:d8
 	else
-		ssh ${MENU_server2[3]}@${MENU_server2[0]} "sudo shutdown -now"
+		ssh ${server2[3]}@${server2[0]} "sudo shutdown -now"
 	fi
 }
 
