@@ -1,0 +1,47 @@
+#!/bin/bash
+
+raspi1='192.168.0.1'
+raspi2='192.168.1.2'
+raspi3='192.168.1.3'
+raspi4='192.168.1.4'
+raspi5='192.168.0.9'
+raspi6='192.168.0.130'
+raspi7='192.168.0.131'
+server='192.168.0.2'
+bladeserver='192.168.0.5'
+
+serverList=('Raspi-1' 'Raspi-2' 'Raspi-3' 'Raspi-4' 'Raspi-5' 'Raspi-6' 'Rasp-7' 'Server' 'BladeServer' )
+actionsList=('SSH_Server' 'Restart' 'Shutdown' 'Edit_Files' 'Restart_Services')
+
+file_rclocal='/etc/rc.local'
+file_fstab='/etc/fstab'
+file_bashrc='/.bashrc'
+
+command_ssh='ssh -Y ${user}@{ipaddress}'
+command_restart="ssh -Y ${user}@{ipaddress} 'sudo reboot'"
+command_poweroff="ssh -Y ${user}@{ipaddress} 'sudo poweroff'"
+command_manualcommand="ssh -Y ${user}@{ipaddress} ${manualcommand}"
+
+###Start Of Script
+###Generate GUI Lists
+serverListGUI=''
+for host in ${serverList[*]}; do
+	serverListGUI+='FALSE '
+	serverListGUI+=$host' '
+done
+actionsListGUI=''
+for action in ${actionsList[*]}; do
+	actionsListGUI+='FALSE '
+	actionsListGUI+=$action' '
+done
+
+
+###MAIN MENU
+function serversMenuGUI {
+	action=$(yad --title="Servers Menu" --width=500 --height=500 --list --checklist  --item-separator=" " --column=Select --column=Server ${actionsListGUI[*]})
+	case $action in
+		"SSH_Server")
+			server=$(yad --title="Servers List" --width=500 --height=500 --list --checklist  --item-separator=" " --column=Select --column=Server ${serverListGUI[*]})
+			;;
+	esac
+}

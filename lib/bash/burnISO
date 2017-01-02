@@ -29,9 +29,9 @@ ANS1=$(zenity  --list  --text "Type Of Installation" --radiolist  --column "Pick
 
 case "$ANS1" in
 	"USB and SD Memory")
-		driveinfo=$(sudo lsblk -io KNAME,TYPE,SIZE,MODEL)
-		zenity --info --width=600 --title="Drive Info" --text="${driveinfo}" 
-		DRIVE=$(find /dev -mindepth 1 -maxdepth 1  -name "*[sh]d[a-z]"  | sort | awk '{ printf "FALSE""\0"$0"\0" }' | xargs -0 zenity --list --height=400 --width=600 --title="Drive to Install To" --text="Choose a drive" --radiolist --multiple --column ' ' --column 'Devices')
+		driveinfo=$(eval exec yad --title="xdf" --image=drive-harddisk --text="Disk\ usage:" --buttons-layout=end --width=650 --multi-progress $(df -hT $1 | tail -n +2 | awk '{printf "--bar=\"<b>%s</b> (%s - %s) [%s/%s]\" %s ", $7, $1, $2, $4, $3, $6}') & ) 
+		DRIVE=$(find /dev -mindepth 1 -maxdepth 1  -name "*[sh]d[a-z]"  | sort | awk '{ printf "FALSE""\0"$0"\0" }' | xargs -0 zenity --list --height=400 --width=600 --title="Drive to Install To" --text="Choose a drive" --radiolist --multiple --column ' ' --column 'Devices' & )
+		wait
 		ANS2=$(zenity  --list --height=400 --width=800 --text "Type Of Installation" --radiolist  --column "Pick" --column "Type" TRUE "Live USB" FALSE "SD Card" FALSE "Windows" FALSE "Manual File Selection")
 		case "$ANS2" in
 			'Live USB')

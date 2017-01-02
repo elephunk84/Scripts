@@ -1,7 +1,5 @@
 #!/bin/bash
 
-cd /home/iainstott/GitRepo/Scripts
-
 hostname=$(hostname)
 server='physical-server'
 kodiHOME='/home/iainstott/.kodi/'
@@ -34,7 +32,7 @@ touch ${IPTVMYM3U}
 rm -rf ${kodiLOCAL}IPTVLists/strings.txt
 touch ${kodiLOCAL}IPTVLists/strings.txt
 
-n=01
+n=001
 
 DATE=$(date +%d-%m-%y)
 wget -O ${kodiLOCAL}"IPTVLists/Archive/${DATE}_1.m3u" "http://uk-mega-iptv.is-found.org:25461/get.php?username=IainStott&password=QAcEiPTJsK&type=m3u&output=ts"
@@ -49,13 +47,16 @@ while [ -f ${IPTVtempfile} ]; do
 		name=${name##*|}
 		echo $name >> ${kodiLOCAL}/IPTVLists/Channels.txt
 		name=${name//[^[:alnum:]]/_}
-		head -2 ${IPTVtempfile} > ${IPTVChannelFolder}${n}"_"${name}".m3u" && sed -i '1,+1d' ${IPTVtempfile}
+		number=$(echo $n | awk '{printf("%04d", $1)}')
+		head -2 ${IPTVtempfile} > ${IPTVChannelFolder}${number}"_"${name}".m3u" && sed -i '1,+1d' ${IPTVtempfile}
 		((n++))
 	else
 		rm -rf ${IPTVtempfile} 
 	fi
 done
 
-python3 /home/iainstott/GitRepo/Scripts/lib/python/kodiSORTIPTV.py
-cp ${IPTVM3U} ${kodiREMOTE}"IPTV.m3u"
-cp ${IPTVMYM3U} ${kodiREMOTE}"MYIPTV.m3u"
+channels=`cd ${IPTVChannelFolder}
+		 find ./ -name "*.*" -type f | sort -z |\
+         zenity --list --checklist --height=800 --width=600 --separator='\n' --title="Select Results." \
+                --text="Finding all Channels..." --column="" --column="Files"`
+

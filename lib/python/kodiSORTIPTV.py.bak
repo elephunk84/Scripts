@@ -1,0 +1,223 @@
+#!/bin/python3
+import datetime, os, sys, collections, glob, re
+global data 
+
+os.chdir("/home/iainstott/Kodi/IPTVLists")
+channelDIR="Channels"
+
+date=datetime.datetime.now().strftime("%d-%m-%y")
+m3u1FILE=("Archive/"+str(date)+"_1.m3u")
+m3u2FILE=("Archive/"+str(date)+"_2.m3u")
+M3UFILES=[m3u1FILE, m3u2FILE]
+m3uFILE="IPTV.m3u"
+mym3uFILE="MYIPTV.m3u"
+
+fileHEADER="#EXTM3U"
+lineSTART="#EXTINF:-1,"
+data=''
+
+channels={
+"001":"BBC 1",
+"002":"BBC 2",
+"003":"ITV HD",
+"004":"Channel 4",
+"005":"Channel 5",
+"006":"BBC Three",
+"007":"BBC Four",
+"008":"ITV 1 +1",
+"009":"ITV 2",
+"010":"ITV 2 +1",
+"011":"ITV 3",
+"012":"ITV 3 +1",
+"013":"ITV 4",
+"014":"ITV 4 +1",
+"015":"ITV Encore",
+"016":"ITV Be",
+"017":"E4",
+"018":"E4 +1",
+"019":"Channel 4 +1",
+"020":"Channel 5 +1",
+"021":"Sky 1",
+"022":"Sky 2",
+"023":"Sky Atlanic",
+"024":"Sky Living",
+"025":"5 Star",
+"026":"Five USA",
+"027":"Universal",
+"028":"Dave SD",
+"029":"Quest",
+"030":"SyFy",
+"031":"DMAX SD",
+"032":"Fox",
+"033":"Watch",
+"034":"Bravo",
+"035":"Discovery",
+"036":"Discovery Turbo",
+"037":"Discovery Shed",
+"038":"Discovery Science",
+"039":"Discovery Investigation",
+"040":"Discovery Real Time",
+"041":"Discovery Showcase",
+"042":"National Geographic",
+"043":"National Geographic Wild",
+"044":"Eden",
+"045":"Eden +1",
+"046":"History Channel",
+"047":"History Channel +1",
+"048":"H2",
+"049":"Crime (CI)",
+"050":"Sky Cinema Premiere",
+"051":"Sky Cinema Hits",
+"052":"Sky Cinema Greats",
+"053":"Sky Cinema Disney",
+"054":"Sky Cinema Christmas",
+"055":"Sky Cinema Action & Adventure",
+"056":"Sky Cinema Comedy",
+"057":"Sky Cinema Crime & Thriller",
+"058":"Sky Cinema Drama & Romance",
+"059":"Sky Cinema Scifi & Horror",
+"060":"Sky Cinema Select",
+"061":"Film4",
+"062":"TCM",
+"063":"Movies24",
+"064":"Movies 4 Men",
+"065":"True Movies 1",
+"066":"True Movies 2",
+"067":"Disney Channel",
+"068":"Disney XD",
+"069":"Disney Junior",
+"070":"Nikelodeon",
+"071":"Nicktoons",
+"072":"Nick Jnr",
+"073":"Cartoonito",
+"074":"Cartoon Network",
+"075":"Boomerang",
+"076":"CBeebies",
+"076":"CBBC Channel",
+"077":"Sky Sports 1",
+"078":"Sky Sports 2",
+"079":"Sky Sports 3",
+"080":"Sky Sports 4",
+"081":"Sky Sports 5",
+"082":"Sky Sports F1",
+"083":"Sky Sports News",
+"084":"Sky Sports Mix",
+"085":"Sky Box Office *",
+"086":"Sky Box Office **",
+"087":"BT Sports 1",
+"088":"BT Sports 2",
+"089":"BT Sports 3",
+"090":"BT Sports Extra 1",
+"091":"BT Sports Extra 2",
+"092":"BT Sports Extra 3",
+"093":"BT Sports Extra 4",
+"094":"BT Sports Extra 5",
+"095":"Eurosport 1",
+"096":"Eurosport 2",
+"096":"Bein 1",
+"097":"Bein 2",
+"098":"Bein 3",
+"099":"Bein 4",
+"100":"Bein 5",
+"101":"Bein 6",
+"102":"Bein 7",
+"103":"Bein 8",
+"104":"Bein 9",
+"105":"Bein 10",
+"106":"Bein 11",
+"107":"Bein 12",
+"108":"Box Nation",
+"109":"LFCTV"
+}
+
+def findMatchingFile (fileList, stringToMatch):
+	for file in fileList:
+		file2=file.split('_',1)[1]
+		file3=re.sub('_', '', file2)
+		file3=file3.lower()
+		stringToMatch=re.sub('_', '', stringToMatch)
+		stringToMatch=stringToMatch.lower()
+		print(file3, stringToMatch)
+		if (stringToMatch == "ITV11"):
+			data=(lineSTART+"ITV 1 +1"+'\n'+"http://live.zoptv.com/filmon/master.m3u8?id=1817"+'\n')
+			f.write(data)
+			return
+		elif (stringToMatch == "ITV21"):
+			data=(lineSTART+"ITV 2 +1"+'\n'+"http://live.zoptv.com/filmon/master.m3u8?id=1820"+'\n')
+			f.write(data)
+			return
+		elif (stringToMatch == "ITV31"):
+			data=(lineSTART+"ITV 3 +1"+'\n'+"http://live.zoptv.com/filmon/master.m3u8?id=1823"+'\n')
+			f.write(data)
+			return
+		elif (stringToMatch == "ITV41"):
+			data=(lineSTART+"ITV 4 +1"+'\n'+"http://live.zoptv.com/filmon/master.m3u8?id=1826"+'\n')
+			f.write(data)
+			return
+		elif (stringToMatch == "historychannel"):
+			filename=(channelDIR+"/"+file)
+			with open(filename, 'r') as myfile:
+				data=myfile.read()
+				f.write(data+'\n')
+				return
+		elif file3.startswith(stringToMatch+"HD"):
+			filename=(channelDIR+"/"+file)
+			with open(filename, 'r') as myfile:
+				data=myfile.read()
+				f.write(data+'\n')
+				return
+		elif file3.startswith(stringToMatch+"SD"):
+			filename=(channelDIR+"/"+file)
+			with open(filename, 'r') as myfile:
+				data=myfile.read()
+				f.write(data+'\n')
+				return
+		elif file3.startswith(stringToMatch):
+			filename=(channelDIR+"/"+file)
+			with open(filename, 'r') as myfile:
+				data=myfile.read()
+				f.write(data+'\n')
+				return
+		elif stringToMatch in file3:
+			filename=(channelDIR+"/"+file)
+			with open(filename, 'r') as myfile:
+				data=myfile.read()
+				f.write(data+'\n')
+				return
+		
+		
+if __name__ == "__main__":
+	lastch=''
+	channels=collections.OrderedDict(sorted(channels.items()))
+	global channel
+	channelList=os.listdir(channelDIR)
+	with open(m3uFILE, 'w') as f:
+		f.write(fileHEADER+'\n')
+		for k, v in channels.items():
+			channel=re.sub(r'[\W_]', '_', v)
+			if channel is not lastch:
+				findMatchingFile(channelList, channel)
+				lastch=channel
+		f.close()
+	with open(m3uFILE,'r+') as file:
+		with open(mym3uFILE, 'w') as out:
+			for line in file:
+				if not line.isspace():
+					out.write(line)
+		out.close()
+	file.close()
+	with open(mym3uFILE,'r+') as file:
+		with open(m3uFILE, 'w') as out:
+			for line in file:
+				if not line.isspace():
+					out.write(line)
+		out.close()
+	file.close()
+	f = open(mym3uFILE,'r')
+	filedata = f.read()
+	f.close()
+	newdata = filedata.replace("IainStott","IainStott2")
+	f = open(mym3uFILE,'w')
+	f.write(newdata)
+	f.close()	
+		

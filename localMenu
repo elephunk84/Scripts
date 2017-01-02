@@ -1,21 +1,35 @@
 #!/bin/bash
 
 cd /home/iainstott/GitRepo/Scripts
-source ./lib/bash/machines
 source ./lib/bash/kodiScripts
 source ./lib/bash/backupRoutine
 source ./lib/bash/burnISO
 source ./lib/bash/otherScripts
+source ./lib/bash/serversMenu
 homeLOCAL='/home/iainstott/'
 homeREMOTE='/mnt/Backup/Iains/Iains\ Laptop/'
 systemRemote='/mnt/Backup/Iains/Iains\ Laptop\ Full/'
 
+release=$(cat /etc/*-release)
+if [[ $release =~ .*Ubuntu.* ]]
+then
+	version="Ubuntu"
+fi
+if [[ $release =~ .*Cent.* ]]
+then
+	version="Cent"
+fi
+if [[ $release =~ .*Arch.* ]]
+then
+	version="Arch"
+fi
+			
 function localMenuGUI {
     date=$(date +%d-%m-%Y_%H:%M)
-    choice=$(zenity --list --text "Local Machine Menu" --height=400 --width=400 --checklist --column "Pick" --column "options" FALSE "Backup Home Folder" FALSE "Backup System" FALSE "Install Program" FALSE "Kodi Menu" FALSE "Network Menu" FALSE "Restart Servers" FALSE "SSH Servers" FALSE "Burn USB ISO")
+    choice=$(zenity --list --text "Local Machine Menu" --height=500 --width=400 --radiolist --column "Pick" --column "options" FALSE "Install Program" FALSE "Edit Local Files" FALSE "Servers Menu" FALSE "Backup Home Folder" FALSE "Backup System" FALSE "Kodi Menu" FALSE "Android Menu" FALSE "Burn USB ISO" FALSE "Launch Tor Browser" FALSE "Tor Browser Over Tor Proxy" FALSE "VPN Connections")
     case $choice in
 		"Backup Home Folder")
-			xterm -e "rsync -aAXHv --delete-during ${homeLOCAL} ${homeREMOTE}"
+			cmd='xterm -e "rsync -aAXHv --delete-during ${homeLOCAL} ${homeREMOTE}"'
 			;;
 		"Backup System")
 			xterm -e "rsync -aAXHv --delete-during --exclude-from=/home/iainstott/GitRepo/Scripts/lib/rsync_exclude.txt / ${systemRemote}"
@@ -25,7 +39,16 @@ function localMenuGUI {
 							 --title="Install new program" \
 							 --text="Enter name of new program:" \
 							 --entry-text "program")
-			xterm -e "sudo pacman -S ${PROGRAM}"
+			case $version in
+				"Ubuntu")
+					xterm -e "sudo apt-get install -y ${PROGRAM}"
+					;;
+				"Cent")
+					xterm -e "sudo yum install -y ${PROGRAM}"
+					;;
+				"Arch")
+					xterm -e "sudo pacman -S -y ${PROGRAM}"
+			esac
 			;;
 		"Kodi Menu")
 			KODI_GUI
@@ -33,12 +56,57 @@ function localMenuGUI {
 		"Burn USB ISO")
 			burnISOGUI
 			;;
-		"Network Menu")
+		"Servers Menu")
 			terminator -p netMenu --geometry=900x530
 			;;
+		"Restart Servers")
+			command='restart'
+			serverPOWER
+			;;
+		"Android Menu")
+			android=$(zenity --list --text "Android Menu" --radiolist --column "Pick" --column "options" TRUE "Install APK" FALSE "Reboot To TWRP" FALSE "Reboot Fastboot")
+				case $android in
+					"Install APK")
+						apk=$(zenity --list --text "APK Menu" --radiolist --column "Pick" --column "options" TRUE "Install APK From List" FALSE "Choose APK")
+						case $apk in
+							"Install APK From List")
+								nmcli c up id HomeVPN
+								;;
+							"Choose APK")
+								nmcli c down id HomeVPN
+								;;
+						esac
+						;;
+					"Reboot To TWRP")
+						nmcli c down id HomeVPN
+						;;
+					"Reboot Fastboot")
+						;;
+				esac
+			;;
 		"Shutdown all Servers")
-			
+			command='shutdown'
+			serverPOWER
+			;;
+		"Launch Tor Browser")
+			/home/iainstott/tor-browser-2/Browser/start-tor-browser
+			;;
+		"Tor Browser Over Tor Proxy")
+			/usr/bin/nmcli c up id Death-Star-Free-WIFI | sleep 5 ; /home/iainstott/tor-browser/Browser/start-tor-browser
+			/usr/bin/nmcli c up id 'Password Is On The Fridge'
+			;;
+		"VPN Connections")
+			vpn=$(zenity --list --text "VPN Menu" --radiolist --column "Pick" --column "options" TRUE "Connect to Home VPN" FALSE "Disconnect Home VPN")
+				case $vpn in
+					"Connect to Home VPN")
+						nmcli c up id HomeVPN
+						;;
+					"Disconnect Home VPN")
+						nmcli c down id HomeVPN
+						;;
+				esac
+			;;
 	esac
-    }
+}
 
 localMenuGUI
