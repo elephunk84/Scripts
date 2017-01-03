@@ -2,17 +2,29 @@
 
 daily="/daily/"
 archive="/archive/"
-backupDir2="/media/Data_Drive/Backup/"
-backupDir="/media/Storage_Drive/Backup"
-softwareDir="/media/Data_Drive/Storage/"
+backupDir2="/media/Backup_Drive/"
+backupDir="/media/Storage_Drive/Backup/"
+softwareDir="/media/Storage_Drive/Storage/"
+dataDir="/media/Data_Drive/"
 NFSShare="/media/Backup_NET/"
 NFSSoftware="/media/Software_NET/"
 GitRepo="/media/Backup_NET/GitRepo/"
 logsDir="${NFSShare}logs/"
 
+raspi1=('192.168.0.4' 'Raspi-1' 'root')
+raspi2=('192.168.1.2' 'Raspi-2' 'osmc')
+raspi3=('192.168.1.3' 'Raspi-3' 'iainstott')
+raspi4=('192.168.1.4' 'Raspi-4' 'iainstott')
+raspi5=('192.168.0.5' 'Raspi-5' 'iainstott')
+raspi6=('192.168.0.130' 'Raspi-6' 'osmc')
+raspi7=('192.168.0.131' 'Raspi-7' 'pi')
+
+raspi1=('192.168.0.4' 'Raspi-1' 'root')
+
 declare machines=( "${raspi1[0]}" "${raspi2[0]}" "${raspi3[0]}" "${raspi4[0]}" "${raspi6[0]}" "${raspi7[0]}")
 
 command="rsync -aAXHv --delete-during --exclude-from=/home/iainstott/GitRepo/Scripts/lib/rsync_exclude.txt "
+command="rsync -aAXHv --exclude-from=/home/iainstott/GitRepo/Scripts/lib/rsync_exclude.txt "
 
 THRESHOLD=$(date -d "46 days ago" +%d-%m-%Y_%H:%M)
 DELETE_OTHERS="yes"
@@ -37,6 +49,11 @@ function backupRoutine_RASPI4 {
     touch ${logsDir}${raspi4[1]}_${date}.log
     ${command} --log-file=${logsDir}${raspi4[1]}_${date}.log ${raspi4[2]}@${raspi4[0]}:/ ${NFSShare}/${raspi4[1]}${daily} 2>&1 >/dev/null
 }
+function backupRoutine_RASPI5 {
+    echo "Now processing Raspi-5"
+    touch ${logsDir}${raspi5[1]}_${date}.log
+    ${command} --log-file=${logsDir}${raspi5[1]}_${date}.log ${raspi5[2]}@${raspi5[0]}:/ ${NFSShare}/${raspi5[1]}${daily} 2>&1 >/dev/null
+}
 function backupRoutine_RASPI6 {
     echo "Now processing Raspi-6"
     touch ${logsDir}${raspi6[1]}_${date}.log
@@ -48,7 +65,6 @@ function backupRoutine_RASPI7 {
     ${command} --log-file=${logsDir}${raspi7[1]}_${date}.log ${raspi7[2]}@${raspi7[0]}:/ ${NFSShare}/${raspi7[1]}${daily} 2>&1 >/dev/null
 }
 function backupRoutine_backupGitRepo {
-    ssh pi@${raspi4[0]} "screen -X -S heating quit"
     cd ${GitRepo}
     for i in $( ls ); 
     do
@@ -68,11 +84,6 @@ function backupRoutine_backupGitRepo {
         git commit -m "backupRoutine"
         git push origin master
         cd ${GitRepo}
-        case $i in
-        "centralheating")
-            ssh pi@${raspi4[0]} "sh /home/pi/GitRepo/centralheating/run_me_on_boot.sh"
-            ;;
-        esac
     done
 }
 
@@ -87,6 +98,7 @@ function backupRoutine_backupSoftwareNET {
     echo "Now processing NFSSoftware"
     touch ${logsDir}NFSSoftware_${date}.log
     ${command} --log-file=${logsDir}NFSSoftware_${date}.log ${NFSSoftware} ${softwareDir} 2>&1 >/dev/null
+	${command2} --log-file=${logsDir}DATADIR_${date}.log ${softwareDir} ${dataDir} 2>&1 >/dev/null
 }
 
 function backupRoutine_backupRPIS {
@@ -95,6 +107,7 @@ function backupRoutine_backupRPIS {
     backupRoutine_RASPI2
     backupRoutine_RASPI3
     backupRoutine_RASPI4
+	backupRoutine_RASPI5
     backupRoutine_RASPI6
     backupRoutine_RASPI7
 }
