@@ -11,7 +11,7 @@ NFSSoftware="/media/Software_NET/"
 GitRepo="/media/Backup_NET/GitRepo/"
 logsDir="${NFSShare}logs/"
 
-raspi1=('192.168.0.4' 'Raspi-1' 'root')
+raspi1=('192.168.0.4' 'Raspi-1' 'iainstott')
 raspi2=('192.168.1.2' 'Raspi-2' 'osmc')
 raspi3=('192.168.1.3' 'Raspi-3' 'iainstott')
 raspi4=('192.168.1.4' 'Raspi-4' 'iainstott')

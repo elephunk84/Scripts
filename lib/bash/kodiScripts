@@ -129,7 +129,7 @@ function KODI_GUI {
 			terminator -e 'source /home/iainstott/GitRepo/Scripts/lib/bash/kodiScripts; KODI_UpdateGITREPO'
 			;;
 		"Sort IPTV List")
-			terminator -e /home/iainstott/GitRepo/Scripts/lib/bash/kodiSORTIPTV
+			terminator -e "ssh -Y iainstott@192.168.0.2 'source /home/iainstott/GitRepo/Scripts/lib/bash/kodiSORTIPTV; kodiSORTIPTV_GUI'"
 			;;
 		"Restore Build")
 			KODI_RestoreBUILD

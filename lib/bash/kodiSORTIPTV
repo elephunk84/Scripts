@@ -32,7 +32,7 @@ function kodiSORTIPTV_ProcessStart {
 	if [ ${hostname} == ${server} ] || [ ${hostname} == ${bladeserver} ]
 	then
 		kodiREMOTE='/media/Backup_NET/Iains/KodiRepo/'
-		rsync -azvP ${kodiREMOTE} ${kodiLOCAL}
+		rsync -azvP /media/Backup_NET/Iains/KodiRepo/ /home/iainstott/Kodi/
 	fi
 	rm -rf ${IPTVChannelList}
 	touch ${IPTVChannelList}
@@ -47,7 +47,6 @@ function kodiSORTIPTV_ProcessStart {
 	n=1
 	DATE=$(date +%d-%m-%y)
 	wget -O ${kodiLOCAL}"IPTVLists/Archive/${DATE}_1.m3u" "http://uk-mega-iptv.is-found.org:25461/get.php?username=IainStott&password=QAcEiPTJsK&type=m3u&output=ts"
-	wget -O ${kodiLOCAL}"IPTVLists/Archive/${DATE}_2.m3u" "http://uk-mega-iptv.is-found.org:25461/get.php?username=IainStott2&password=QAcEiPTJsK&type=m3u&output=ts"
 	cp ${kodiLOCAL}"IPTVLists/Archive/${DATE}_1.m3u" ${IPTVtempfile}
 	head -n 1 ${IPTVtempfile} > /dev/null && sed -i '1,+2d' ${IPTVtempfile}
 	while [ -f ${IPTVtempfile} ]; do
@@ -68,16 +67,21 @@ function kodiSORTIPTV_ProcessStart {
 }
 
 function kodiSORTIPTV_ProcessEnd {
-	python3 ./lib/python/kodiSORTIPTV.py
+	if [ $GUI_START == 'YES' ]
+	then
+		python3 ./lib/python/kodiSORTIPTV_GUI.py
+	else
+		python3 ./lib/python/kodiSORTIPTV.py
+	fi
 	cp ${IPTVM3U} ${kodiLOCAL}"IPTV.m3u"
 	cp ${IPTVMYM3U} ${kodiLOCAL}"MYIPTV.m3u"
 	if [ ${updateGUIDE} == 'YES' ]
 	then
 		/usr/bin/mono ${kodiLOCAL}"WebGrab/WebGrab+Plus.exe" ${kodiLOCAL}"WebGrab/"
 	fi
-	if [ ${hostname} == ${bladeserver} ]
+	if [ ${hostname} == ${server} ] || [ ${hostname} == ${bladeserver} ]
 	then
-		ssh iainstott@192.168.0.2 'rsync -azvP iainstott@192.168.0.6:/home/iainstott/Kodi/ /home/iainstott/Kodi/'
+		rsync -azvP /home/iainstott/Kodi/ /media/Backup_NET/Iains/KodiRepo/
 	fi
 }
 
@@ -88,10 +92,13 @@ function kodiSORTIPTV_Process {
 }
 
 function kodiSORTIPTV_GUI {
+	GUI_START='YES'
 	kodiSORTIPTV_ProcessStart
 	channels=`cat ${kodiLOCAL}/IPTVLists/Channels.txt | awk '{print "FALSE\n"$0}' | zenity --list --checklist \
          --separator='/ ' --title="Select Results." --height=600 --width=600 \
-         --text="Finding all channels..." --column="" --column="Select"`
+         --text="Finding all channels..." --column="" --column="Select" & zenity --list --checklist \
+         --separator='/ ' --title="Channels" --height=600 --width=600 \
+         --text="Channel List" --column="" --column="Select"`
     echo ${channels[*]}
 	zenity --question --text="Update Guide" --ok-label="Yes" --cancel-label="No"
 	if [ $? = 0 ] ; then
