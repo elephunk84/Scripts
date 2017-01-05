@@ -19,6 +19,7 @@ IPTVfile=${kodiLOCAL}"IPTV.m3u"
 IPTVtempfile=${kodiLOCAL}"IPTVtemp.m3u"
 IPTVChannelFolder=${kodiLOCAL}"IPTVLists/Channels/"
 IPTVChannelList=${kodiLOCAL}"/IPTVLists/Channels.txt"
+updateGUIDE='NO'
 
 one=( '1' 'one' )
 two=( '2' 'two' )
@@ -32,8 +33,10 @@ function kodiSORTIPTV_ProcessStart {
 	if [ ${hostname} == ${server} ] || [ ${hostname} == ${bladeserver} ]
 	then
 		kodiREMOTE='/media/Backup_NET/Iains/KodiRepo/'
-		rsync -azvP /media/Backup_NET/Iains/KodiRepo/ /home/iainstott/Kodi/
+		sudo rsync -avP iainstott@192.168.0.4:/mnt/Backup/Iains/KodiRepo/ /home/iainstott/Kodi/
 	fi
+	rm -rf ${kodiLOCAL}"IPTVLists/Archive/${DATE}_1.m3u"
+	rm -rf ${kodiLOCAL}"IPTVLists/Archive/${DATE}_2.m3u"
 	rm -rf ${IPTVChannelList}
 	touch ${IPTVChannelList}
 	rm -rf ${IPTVChannelFolder}
@@ -48,22 +51,6 @@ function kodiSORTIPTV_ProcessStart {
 	DATE=$(date +%d-%m-%y)
 	wget -O ${kodiLOCAL}"IPTVLists/Archive/${DATE}_1.m3u" "http://uk-mega-iptv.is-found.org:25461/get.php?username=IainStott&password=QAcEiPTJsK&type=m3u&output=ts"
 	cp ${kodiLOCAL}"IPTVLists/Archive/${DATE}_1.m3u" ${IPTVtempfile}
-	head -n 1 ${IPTVtempfile} > /dev/null && sed -i '1,+2d' ${IPTVtempfile}
-	while [ -f ${IPTVtempfile} ]; do
-		firstLINE=$(head -n 1 ${IPTVtempfile})
-		if [ ${#firstLINE} -ge 1 ]
-		then
-			name=${firstLINE##*,}
-			number=000$n
-			echo ${name} >> ${kodiLOCAL}/IPTVLists/Channels.txt
-			name=${name##*|}
-			name=${name//[^[:alnum:]]/_}
-			head -2 ${IPTVtempfile} > ${IPTVChannelFolder}${number: -4}"_"${name}".m3u" && sed -i '1,+1d' ${IPTVtempfile}
-			((n++))
-		else
-			rm -rf ${IPTVtempfile} 
-		fi
-	done
 }
 
 function kodiSORTIPTV_ProcessEnd {
@@ -81,7 +68,7 @@ function kodiSORTIPTV_ProcessEnd {
 	fi
 	if [ ${hostname} == ${server} ] || [ ${hostname} == ${bladeserver} ]
 	then
-		rsync -azvP /home/iainstott/Kodi/ /media/Backup_NET/Iains/KodiRepo/
+		rsync -azvP /home/iainstott/Kodi/ iainstott@192.168.1.1:/mnt/Backup/Iains/KodiRepo/
 	fi
 }
 
@@ -94,17 +81,16 @@ function kodiSORTIPTV_Process {
 function kodiSORTIPTV_GUI {
 	GUI_START='YES'
 	kodiSORTIPTV_ProcessStart
-	channels=`cat ${kodiLOCAL}/IPTVLists/Channels.txt | awk '{print "FALSE\n"$0}' | zenity --list --checklist \
-         --separator='/ ' --title="Select Results." --height=600 --width=600 \
-         --text="Finding all channels..." --column="" --column="Select" & zenity --list --checklist \
-         --separator='/ ' --title="Channels" --height=600 --width=600 \
-         --text="Channel List" --column="" --column="Select"`
-    echo ${channels[*]}
-	zenity --question --text="Update Guide" --ok-label="Yes" --cancel-label="No"
+	#channels=`cat ${kodiLOCAL}/IPTVLists/Channels.txt | awk '{print "FALSE\n"$0}' | zenity --list --checklist \
+    #     --separator='/ ' --title="Select Results." --height=600 --width=600 \
+    #     --text="Finding all channels..." --column="" --column="Select" & zenity --list --checklist \
+    #     --separator='/ ' --title="Channels" --height=600 --width=600 \
+    #     --text="Channel List" --column="" --column="Select"`
+    zenity --question --text="Update Guide" --ok-label="Yes" --cancel-label="No"
 	if [ $? = 0 ] ; then
 		updateGUIDE='YES'
 	else
-		updateGUIDE=''
+		updateGUIDE='NO'
 	fi
 	kodiSORTIPTV_ProcessEnd
 }
