@@ -51,7 +51,7 @@ function localMenuGUI {
 			esac
 			;;
 		"Kodi Menu")
-			rsync -azvP /media/Backup/Iains/KodiRepo/ /home/iainstott/Kodi/
+			rsync -azvP --delete-during /media/Backup/Iains/KodiRepo/ /home/iainstott/Kodi/
 			KODI_GUI
 			;;
 		"Burn USB ISO")

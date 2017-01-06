@@ -16,7 +16,7 @@ kodiArchive=${kodiLOCAL}"backupFolder/BuildArchive/"
 IPTVM3U=${kodiLOCAL}"IPTVLists/IPTV.m3u"
 IPTVMYM3U=${kodiLOCAL}"IPTVLists/MYIPTV.m3u"
 IPTVfile=${kodiLOCAL}"IPTV.m3u"
-IPTVtempfile=${kodiLOCAL}"IPTVtemp.m3u"
+IPTVMYfile=${kodiLOCAL}"MYIPTV.m3u"
 IPTVChannelFolder=${kodiLOCAL}"IPTVLists/Channels/"
 IPTVChannelList=${kodiLOCAL}"/IPTVLists/Channels.txt"
 updateGUIDE='NO'
@@ -33,33 +33,23 @@ function kodiSORTIPTV_ProcessStart {
 	if [ ${hostname} == ${server} ] || [ ${hostname} == ${bladeserver} ]
 	then
 		kodiREMOTE='/media/Backup_NET/Iains/KodiRepo/'
-		sudo rsync -avP iainstott@192.168.0.4:/mnt/Backup/Iains/KodiRepo/ /home/iainstott/Kodi/
+		sudo rsync -avP --delete-during /media/Backup_NET/Iains/KodiRepo/ /home/iainstott/Kodi/
 	fi
 	rm -rf ${kodiLOCAL}"IPTVLists/Archive/${DATE}_1.m3u"
 	rm -rf ${kodiLOCAL}"IPTVLists/Archive/${DATE}_2.m3u"
 	rm -rf ${IPTVChannelList}
 	touch ${IPTVChannelList}
-	rm -rf ${IPTVChannelFolder}
-	mkdir ${IPTVChannelFolder}
 	rm -rf ${IPTVM3U}
 	rm -rf ${IPTVMYM3U}
 	touch ${IPTVM3U}
 	touch ${IPTVMYM3U}
-	rm -rf ${kodiLOCAL}IPTVLists/strings.txt
-	touch ${kodiLOCAL}IPTVLists/strings.txt
 	n=1
 	DATE=$(date +%d-%m-%y)
 	wget -O ${kodiLOCAL}"IPTVLists/Archive/${DATE}_1.m3u" "http://uk-mega-iptv.is-found.org:25461/get.php?username=IainStott&password=QAcEiPTJsK&type=m3u&output=ts"
-	cp ${kodiLOCAL}"IPTVLists/Archive/${DATE}_1.m3u" ${IPTVtempfile}
-}
+	}
 
 function kodiSORTIPTV_ProcessEnd {
-	if [ $GUI_START == 'YES' ]
-	then
-		python3 ./lib/python/kodiSORTIPTV_GUI.py
-	else
-		python3 ./lib/python/kodiSORTIPTV.py
-	fi
+	python3 ./lib/python/kodiSORTIPTV_GUI.py
 	cp ${IPTVM3U} ${kodiLOCAL}"IPTV.m3u"
 	cp ${IPTVMYM3U} ${kodiLOCAL}"MYIPTV.m3u"
 	if [ ${updateGUIDE} == 'YES' ]
@@ -68,25 +58,27 @@ function kodiSORTIPTV_ProcessEnd {
 	fi
 	if [ ${hostname} == ${server} ] || [ ${hostname} == ${bladeserver} ]
 	then
-		rsync -azvP /home/iainstott/Kodi/ iainstott@192.168.1.1:/mnt/Backup/Iains/KodiRepo/
+		rsync -azvP --delete-during /home/iainstott/Kodi/ /media/Backup_NET/Iains/KodiRepo/
 	fi
 }
 
 function kodiSORTIPTV_Process {
 	kodiSORTIPTV_ProcessStart
 	updateGUIDE='YES'
+	python3 -c 'import lib.python.kodiSORTIPTV_GUI as sortiptv; sortiptv.renumberCHANNELS()'
 	kodiSORTIPTV_ProcessEnd
 }
 
 function kodiSORTIPTV_GUI {
 	GUI_START='YES'
 	kodiSORTIPTV_ProcessStart
-	#channels=`cat ${kodiLOCAL}/IPTVLists/Channels.txt | awk '{print "FALSE\n"$0}' | zenity --list --checklist \
-    #     --separator='/ ' --title="Select Results." --height=600 --width=600 \
-    #     --text="Finding all channels..." --column="" --column="Select" & zenity --list --checklist \
-    #     --separator='/ ' --title="Channels" --height=600 --width=600 \
-    #     --text="Channel List" --column="" --column="Select"`
-    zenity --question --text="Update Guide" --ok-label="Yes" --cancel-label="No"
+	zenity --question --text="Re-Number Channels" --ok-label="Yes" --cancel-label="No"
+	if [ $? = 0 ] ; then
+		python3 -c 'import lib.python.kodiSORTIPTV_GUI as sortiptv; sortiptv.renumberCHANNELS()'
+	else
+		updateGUIDE='NO'
+	fi
+	zenity --question --text="Update Guide" --ok-label="Yes" --cancel-label="No"
 	if [ $? = 0 ] ; then
 		updateGUIDE='YES'
 	else

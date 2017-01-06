@@ -134,8 +134,6 @@ def findMatchingFile (fileList, stringToMatch):
 	data=''
 	stringToMatch=re.sub(r'[\W_]', '',stringToMatch)
 	stringToMatch=stringToMatch.lower()	
-	with open('strings.txt', 'a') as channelstxt:
-		channelstxt.write(stringToMatch+'\n')
 	for file in fileList:
 		file2=file.split('_',1)[1]
 		file3=re.sub('_', '', file2)

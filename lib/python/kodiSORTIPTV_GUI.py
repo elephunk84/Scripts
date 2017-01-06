@@ -1,43 +1,64 @@
 #!/bin/python3
 import datetime, os, sys, collections, glob, re, subprocess, itertools
 
-os.chdir("/home/iainstott/Kodi/IPTVLists")
+os.chdir("/home/iainstott/Kodi/")
 channelDIR="Channels"
 data=''
 
 date=datetime.datetime.now().strftime("%d-%m-%y")
-m3u1FILE=("Archive/"+str(date)+"_1.m3u")
-m3u2FILE=("Archive/"+str(date)+"_2.m3u")
+m3u1FILE=("IPTVLists/Archive/"+str(date)+"_1.m3u")
+m3u2FILE=("IPTVLists/Archive/"+str(date)+"_2.m3u")
 M3UFILES=[m3u1FILE, m3u2FILE]
-m3uFILE="IPTV.m3u"
-mym3uFILE="MYIPTV.m3u"
-newm3u="NEW.m3u"
-channellist="Channel_LIST.txt"
+m3uFILE="IPTVLists/IPTV.m3u"
+mym3uFILE="IPTVLists/MYIPTV.m3u"
+channellist="IPTVLists/Channel_LIST.txt"
 fileHEADER="#EXTM3U"
 lineSTART="#EXTINF:-1,"
+webgrabCONFIG="WebGrab/WebGrab++.config.xml"
+webgrabSTART="WebGrab/config.start"
+
 
 mychannelsDICT={}
 mychannelsDICTMASTER={}
 availchannelsDICT={}
 
+def renumberCHANNELS ():
+	number=1
+	with open('IPTVLists/channelstemp.txt', 'w') as f:
+		with open('IPTVLists/Channel_LIST.txt', 'r') as channelfile:
+			lines=channelfile.readlines()
+			for line in lines:
+				line=line.split(" | ",1)[1]
+				f.write(line)
+	with open('IPTVLists/Channel_LIST.txt', 'w') as channellist:
+		with open('IPTVLists/channelstemp.txt', 'r') as f:
+			lines2=f.readlines()
+			for line in lines2:
+					number2="{:0>3}".format(number) 
+					channellist.write(number2+' | '+line)
+					number+=1
+	os.remove('IPTVLists/channelstemp.txt')
+					
 def buildDICTIONARIES ():
 	with open(channellist, 'rU') as mychannels:
 		for line in mychannels:
-			name=line.rsplit('|',1)
-			name=(name[1])
-			name=name.rstrip('\n')
-			name=name[1:]
-			channel=line.split("|", 1)[0]
-			group=line.split("|",1)[1]
-			group=group.split("|",1)[0]
-			data=(channel, group)
+			try:
+				(channel, group, name, site, idnumber)=line.split(' | ')
+				idnumber=idnumber.strip('\n')
+				data=(channel, group, name, site, idnumber)
+			except ValueError:
+				(channel, group, name)=line.split(' | ')
+				name=name.strip('\n')
+				data=(channel, group, name)
 			mychannelsDICT[name]=data
 	with open(m3u1FILE, 'r') as availChannels:
 		data = availChannels.read().splitlines(True)
 	with open(m3u2FILE, 'w') as fout:
 		fout.writelines(data[1:])
 	with open(m3u2FILE, 'r') as f:
-		with open('Channels.txt', 'w') as channelsfile:
+		with open('IPTVLists/Channels.txt', 'w') as channelsfile:
+			with open('IPTVLists/FILMON.m3u' ,'r') as filmon:
+				lines
 			for line in f:
 				line=line.split(',',1)[1]
 				nextline=next(f)
@@ -57,31 +78,67 @@ def buildDICTIONARIES ():
 					pass
 				continue
 				channelsfile.close()
-		
+	with open('IPTVLists/Channels.txt', 'r') as channellistsorting:
+		lines=channellistsorting.readlines()
+		lines.sort()
+	with open('IPTVLists/Channels.txt', 'w') as channellistsorted:
+		for line in lines:
+			channellistsorted.write(line)
+	
 def buildMasterDICT ():
 	for key in mychannelsDICT.keys() & availchannelsDICT.keys():
 		name=key
+		name=name.replace('&', 'and')
 		data=mychannelsDICT[key]
 		channel=data[0]
 		group=data[1]
 		link=availchannelsDICT[key]
-		data2=[name, group, link]
+		try:
+			site=data[3]
+			idnumber=data[4]
+			link=availchannelsDICT[key]
+			data2=[name, group, link, site, idnumber]
+		except (ValueError, IndexError) as e:
+			data2=[name, group, link]
 		mychannelsDICTMASTER[channel]=data2
 
 def buildM3UFILE ():
-	with open(newm3u, 'w') as f:
-		f.write(fileHEADER+'\n')
-		channels=collections.OrderedDict(sorted(mychannelsDICTMASTER.items()))
-		for key, value in channels.items():
-			name=(value[0])
-			group=(value[1])
-			link=(value[2])
-			f.write(lineSTART+str(group)+' | '+str(name)+'\n')
-			f.write(str(link)+'\n')
+	with open(m3uFILE, 'w') as f:
+		with open(mym3uFILE, 'w') as myf:
+			f.write(fileHEADER+'\n')
+			myf.write(fileHEADER+'\n')
+			channels=collections.OrderedDict(sorted(mychannelsDICTMASTER.items()))
+			for key, value in channels.items():
+				name=(value[0])
+				group=(value[1])
+				link=(value[2])
+				link2=link.replace("IainStott", "IainStott2")
+				f.write(lineSTART+str(group)+' | '+str(name)+'\n')
+				f.write(str(link)+'\n')
+				myf.write(lineSTART+str(group)+' | '+str(name)+'\n')
+				myf.write(str(link2)+'\n')
 	f.close()
-			
+	myf.close()
 
+def buildGUIDE ():
+		with open(webgrabCONFIG, 'w') as config:
+			with open(webgrabSTART, 'r') as start:
+				lines=start.readlines()
+				for line in lines:
+					config.write(line)
+			channels=collections.OrderedDict(sorted(mychannelsDICTMASTER.items()))
+			for key, value in channels.items():
+				if len(value) == 5:
+					site=(value[3])
+					name=(value[1]+' | '+value[0])
+					idnumber=(value[4])
+					guideLINE='	<channel update="'+'i'+'" site="'+site+'" site_id="'+idnumber+'" xmltv_id="'+name+'">'+name+'</channel>'
+					config.write(guideLINE+'\n')
+			config.write("</settings>")
+		config.close()
+		
 if __name__ == "__main__":
 	buildDICTIONARIES()
 	buildMasterDICT()
 	buildM3UFILE()
+	buildGUIDE()
