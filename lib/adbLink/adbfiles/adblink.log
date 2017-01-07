@@ -1,0 +1,39 @@
+adbLink 2.07
+010617213521
+Linux
+------------
+getting database record
+SELECT Id FROM device WHERE description=""
+SELECT daddr FROM device WHERE description=""
+server started
+* daemon not running. starting it now on port 5037 *
+* daemon started successfully *
+
+starting server
+go to dataentry -- new record
+opening preferences dialog
+go insert a record
+Insert new record
+getting database record
+SELECT Id FROM device WHERE description="Mums Firestick"
+SELECT daddr FROM device WHERE description="Mums Firestick"
+device:192.168.0.99:5555
+Connected to 192.168.0.99:5555
+process time duration: 6 seconds
+device:192.168.0.99:5555
+Connected to 192.168.0.99:5555
+process time duration: 3 seconds
+device:192.168.0.99:5555
+Connected to 192.168.0.99:5555
+process time duration: 3 seconds
+device:192.168.0.99:5555
+Connected to 192.168.0.99:5555
+process time duration: 3 seconds
+detaching console process
+getting database record
+SELECT Id FROM device WHERE description="Mums Firestick"
+SELECT daddr FROM device WHERE description="Mums Firestick"
+detaching console process
+192.168.0.99:5555
+closing program
+server stopped

@@ -1,0 +1,12 @@
+adbLink 2.07
+010617203451
+Linux
+------------
+getting database record
+SELECT Id FROM device WHERE description=""
+SELECT daddr FROM device WHERE description=""
+server started
+* daemon not running. starting it now on port 5037 *
+* daemon started successfully *
+
+starting server

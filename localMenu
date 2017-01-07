@@ -51,7 +51,12 @@ function localMenuGUI {
 			esac
 			;;
 		"Kodi Menu")
-			rsync -azvP --delete-during /media/Backup/Iains/KodiRepo/ /home/iainstott/Kodi/
+			zenity --question --text="Update Local Repo First??" --ok-label="Yes" --cancel-label="No"
+			if [ $? = 0 ] ; then
+				rsync -azvP --delete-during /media/Backup/Iains/KodiRepo/ /home/iainstott/Kodi/
+			else
+				continue
+			fi	
 			KODI_GUI
 			;;
 		"Burn USB ISO")
@@ -65,13 +70,18 @@ function localMenuGUI {
 			serverPOWER
 			;;
 		"Android Menu")
-			android=$(zenity --list --text "Android Menu" --radiolist --column "Pick" --column "options" TRUE "Install APK" FALSE "Reboot To TWRP" FALSE "Reboot Fastboot")
+			sudo adb kill-server
+			sudo adb start-server
+			android=$(zenity --list --text "Android Menu" --radiolist --column "Pick" --column "options" TRUE "adbLink" FALSE "Install APK" FALSE "Reboot To TWRP" FALSE "Reboot Fastboot")
 				case $android in
+					"adbLink")
+						xterm -e "sudo /home/iainstott/GitRepo/Scripts/lib/adbLink/adbLink"
+						;;
 					"Install APK")
 						apk=$(zenity --list --text "APK Menu" --radiolist --column "Pick" --column "options" TRUE "Install APK From List" FALSE "Choose APK")
 						case $apk in
 							"Install APK From List")
-								nmcli c up id HomeVPN
+								
 								;;
 							"Choose APK")
 								nmcli c down id HomeVPN

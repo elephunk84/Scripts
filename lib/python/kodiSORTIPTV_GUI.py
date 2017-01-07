@@ -55,10 +55,14 @@ def buildDICTIONARIES ():
 		data = availChannels.read().splitlines(True)
 	with open(m3u2FILE, 'w') as fout:
 		fout.writelines(data[1:])
+	with open('IPTVLists/FILMON.m3u', 'r') as filmon:
+		with open(m3u2FILE, 'a') as m3FILE:
+			m3FILE.write('\n')
+			lines=filmon.readlines()
+			for line in lines:
+				m3FILE.write(line)
 	with open(m3u2FILE, 'r') as f:
 		with open('IPTVLists/Channels.txt', 'w') as channelsfile:
-			with open('IPTVLists/FILMON.m3u' ,'r') as filmon:
-				lines
 			for line in f:
 				line=line.split(',',1)[1]
 				nextline=next(f)

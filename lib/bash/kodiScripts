@@ -9,7 +9,7 @@ kodiLOCALCURRENT=${kodiLOCAL}"currentBuild/"
 kodiREMOTE='/media/Backup/Iains/KodiRepo/'
 kodiREMOTECURRENT=${kodiREMOTE}"currentBuild/"
 kodiRESET=${kodiLOCAL}"reset.tgz"
-kodiCURRENT=${kodiLOCAL}"current.tgz"
+kodiCURRENT=${kodiLOCAL}"current.zip"
 kodiArchive=${kodiLOCAL}"backupFolder/BuildArchive/"
 
 kodiADDONSLIST=('repository.elephunk84' 'plugin.program.iainstool')
@@ -30,7 +30,7 @@ function KODI_removeLinks {
 			unlink ${ADDON}
 			mkdir ${ADDON}
 			cd ${ADDON}
-			rsync -azh ${kodiLOCAL}${ADDON} .
+			rsync -azh ${kodiREMOTE}${ADDON} .
 			cd ${kodiADDONS}
         done
 }
@@ -40,7 +40,7 @@ function KODI_makeLinks {
     cd ${kodiADDONS}
     for ADDON in ${kodiADDONSLIST[@]}; do
         rm -rf ${ADDON}
-        ln -s ${kodiLOCAL}${ADDON} ./
+        ln -s ${kodiREMOTE}${ADDON} ./
     done
 }
 
@@ -51,16 +51,15 @@ function KODI_Backup {
 	KODI_removeLinks
 	cd ${kodiHOME}
 	echo "Making Archive...."
-	tar --exclude='./userdata/Thumbnails/' --exclude='./addons/packages/' -zcf ${kodiArchive}${date}.tgz *
+	zip -r --exclude="*.zip" ${kodiArchive}${date}.zip ./ 
     cd /home/iainstott/GitRepo/Scripts
 	action=$(zenity  --list --title="Kodi Menu" --text "Build Actions?" --checklist  --column "Pick" --column "Type" FALSE "Create Current")
 		case $action in
 			"Create Current")
 				echo "Creating Current Build"
-				rm -rf ${kodiLOCAL}"current.tgz"
-				rm -rf ${kodiREMOTE}"current.tgz"
+				rm -rf ${kodiLOCAL}"current.zip"
 				rsync -aAXHPv --delete-during ${kodiHOME} ${kodiLOCALCURRENT}
-				cp ${kodiArchive}${date}.tgz ${kodiCURRENT}
+				cp ${kodiArchive}${date}.zip ${kodiCURRENT}
 				;;
 		esac
 	echo "Sync to Remote...."

@@ -19,12 +19,9 @@ raspi5=('192.168.0.5' 'Raspi-5' 'iainstott')
 raspi6=('192.168.0.130' 'Raspi-6' 'osmc')
 raspi7=('192.168.0.131' 'Raspi-7' 'pi')
 
-raspi1=('192.168.0.4' 'Raspi-1' 'root')
-
 declare machines=( "${raspi1[0]}" "${raspi2[0]}" "${raspi3[0]}" "${raspi4[0]}" "${raspi6[0]}" "${raspi7[0]}")
 
-command="rsync -aAXHv --delete-during --exclude-from=/home/iainstott/GitRepo/Scripts/lib/rsync_exclude.txt "
-command="rsync -aAXHv --exclude-from=/home/iainstott/GitRepo/Scripts/lib/rsync_exclude.txt "
+command="sudo rsync -aAXHv --delete-during --exclude-from=/home/iainstott/GitRepo/Scripts/lib/rsync_exclude.txt "
 
 THRESHOLD=$(date -d "46 days ago" +%d-%m-%Y_%H:%M)
 DELETE_OTHERS="yes"
