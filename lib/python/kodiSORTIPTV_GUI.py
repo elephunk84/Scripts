@@ -55,12 +55,6 @@ def buildDICTIONARIES ():
 		data = availChannels.read().splitlines(True)
 	with open(m3u2FILE, 'w') as fout:
 		fout.writelines(data[1:])
-	with open('IPTVLists/FILMON.m3u', 'r') as filmon:
-		with open(m3u2FILE, 'a') as m3FILE:
-			m3FILE.write('\n')
-			lines=filmon.readlines()
-			for line in lines:
-				m3FILE.write(line)
 	with open(m3u2FILE, 'r') as f:
 		with open('IPTVLists/Channels.txt', 'w') as channelsfile:
 			for line in f:
@@ -68,13 +62,22 @@ def buildDICTIONARIES ():
 				nextline=next(f)
 				m3ulink=nextline.rstrip('\n')
 				try:
-					line=line.replace(": ", " | ")
-					line=line.replace("USA: ", "USA  | ")
+					line=line.replace(":", " | ")
 					line=line.replace("| ", "  | ")
 					line=line.replace(" l ", " | ")
+					line=line.replace("DE ", "DE | ")
 					line=line.replace("24/7 ", "24/7  | ")
 					line=line.replace("Adult ", "XXX  | Adult ")
-					channelsfile.write(line)
+					line=line.replace("USA", "USA | ")
+					line2=(' '.join(line.split()))
+					line2=line2.replace("USA | |", "USA |")
+					line2=line2.replace("DE | |", "DE |")
+					line2=line2.replace("VIP USA", "VIP")
+					if "|" not in line2:
+						line3=("VOD | "+line2)
+					else:
+						line3=line2
+					channelsfile.write(line3+'\n')
 					name=line.rstrip('\n')
 					name=name.split('| ',1)[1]
 					availchannelsDICT[name]=m3ulink
@@ -116,11 +119,19 @@ def buildM3UFILE ():
 				name=(value[0])
 				group=(value[1])
 				link=(value[2])
+				if name in ("ITV +1", "ITV 2 +1", "ITV 3 +1", "ITV 4 +1"):
+					lineSTART="#EXTINF:-0,"
+				else:
+				    lineSTART="#EXTINF:-1,"
 				link2=link.replace("IainStott", "IainStott2")
-				f.write(lineSTART+str(group)+' | '+str(name)+'\n')
-				f.write(str(link)+'\n')
-				myf.write(lineSTART+str(group)+' | '+str(name)+'\n')
-				myf.write(str(link2)+'\n')
+				if "Adult" not in group:
+						f.write(lineSTART+str(group)+' | '+str(name)+'\n')
+						f.write(str(link)+'\n')
+						myf.write(lineSTART+str(group)+' | '+str(name)+'\n')
+						myf.write(str(link2)+'\n')
+				else:
+					myf.write(lineSTART+str(group)+' | '+str(name)+'\n')
+					myf.write(str(link2)+'\n')
 	f.close()
 	myf.close()
 
