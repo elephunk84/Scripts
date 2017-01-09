@@ -17,7 +17,7 @@ IPTVM3U=${kodiLOCAL}"IPTVLists/IPTV.m3u"
 IPTVMYM3U=${kodiLOCAL}"IPTVLists/MYIPTV.m3u"
 IPTVfile=${kodiLOCAL}"IPTV.m3u"
 IPTVMYfile=${kodiLOCAL}"MYIPTV.m3u"
-IPTVChannelFolder=${kodiLOCAL}"IPTVLists/Channels/"
+IPTVRadioFolder=${kodiLOCAL}"IPTVLists/Radio/"
 IPTVChannelList=${kodiLOCAL}"/IPTVLists/Channels.txt"
 updateGUIDE='NO'
 
@@ -39,6 +39,8 @@ function kodiSORTIPTV_ProcessStart {
 	rm -rf ${kodiLOCAL}"IPTVLists/Archive/${DATE}_2.m3u"
 	rm -rf ${IPTVChannelList}
 	touch ${IPTVChannelList}
+	rm -rf ${IPTVRadioFolder}
+	touch ${IPTVRadioFolder}
 	rm -rf ${IPTVM3U}
 	rm -rf ${IPTVMYM3U}
 	touch ${IPTVM3U}
@@ -61,6 +63,7 @@ function kodiSORTIPTV_ProcessEnd {
 		rsync -azvP --delete-during /home/iainstott/Kodi/ /media/Backup_NET/Iains/KodiRepo/
 	fi
 }
+
 
 function kodiSORTIPTV_Process {
 	kodiSORTIPTV_ProcessStart

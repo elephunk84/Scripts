@@ -68,7 +68,10 @@ def buildDICTIONARIES ():
 					line=line.replace("DE ", "DE | ")
 					line=line.replace("24/7 ", "24/7  | ")
 					line=line.replace("Adult ", "XXX  | Adult ")
-					line=line.replace("USA", "USA | ")
+					if "Five" not in line:
+						line=line.replace("USA", "USA | ")
+					else:
+						line=line
 					line2=(' '.join(line.split()))
 					line2=line2.replace("USA | |", "USA |")
 					line2=line2.replace("DE | |", "DE |")
@@ -78,7 +81,7 @@ def buildDICTIONARIES ():
 					else:
 						line3=line2
 					channelsfile.write(line3+'\n')
-					name=line.rstrip('\n')
+					name=line3.rstrip('\n')
 					name=name.split('| ',1)[1]
 					availchannelsDICT[name]=m3ulink
 				except IndexError:
