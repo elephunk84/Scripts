@@ -111,6 +111,16 @@ def buildMasterDICT ():
 		except (ValueError, IndexError) as e:
 			data2=[name, group, link]
 		mychannelsDICTMASTER[channel]=data2
+	with open('IPTVLists/NotFound.txt', 'w') as notfound:
+		for key in list(mychannelsDICT.keys()):
+			if key not in availchannelsDICT:
+				notfound.write(key+'\n')
+	with open('IPTVLists/NotFound.txt', 'r') as notfoundsorting:
+		lines=notfoundsorting.readlines()
+		lines.sort()
+	with open('IPTVLists/NotFound.txt', 'w') as notfoundsorted:
+		for line in lines:
+			notfoundsorted.write(line)
 
 def buildM3UFILE ():
 	with open(m3uFILE, 'w') as f:
