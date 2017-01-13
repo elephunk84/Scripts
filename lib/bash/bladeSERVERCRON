@@ -1,29 +1,52 @@
 #!/bin/bash
 
-delay=600
 
-echo "Turning On Power"
-/usr/local/bin/gpio write 1 0
-sleep 5
-echo "Sending Magic Packet"
-/usr/bin/wakeonlan 00:1a:64:23:e5:30 & 
-for ((i=delay; i>=1; i--)); do
-	echo "Waiting For BladeServer to Start"
-	echo "Please wait .... $i Seconds"
-	sleep 1
-	clear
-done
-echo "Sorting IPTV"
-ssh iainstott@192.168.0.6 'source /home/iainstott/GitRepo/Scripts/lib/bash/kodiSORTIPTV; kodiSORTIPTV_Process'
-echo "Running Backup Process"
-ssh iainstott@192.168.0.6 'rsync -avzP /media/Backup_NET/	/media/Backup/'
-echo "Powering Off System"
-ssh iainstott@192.168.0.6 'sudo poweroff -f'
-for ((i=delay; i>=1; i--)); do
-	echo "Waiting For BladeServer to Stop"
-	echo "Please wait .... $i Seconds"
-	sleep 1
-	clear
-done
-echo "Turning Off Power"
-/usr/local/bin gpio write 1 1
+function timer {
+	delay=300
+	if [ $1 == 'Stop' ]
+	then
+		delay=60
+	fi
+	for ((i=delay; i>=1; i--)); do
+		echo "Waiting For BladeServer to $1"
+		echo "Please wait .... $i Seconds"
+		sleep 1
+		clear
+	done
+}
+
+function turnON {
+	echo "Turning On Power"
+	/usr/local/bin/gpio write 1 0
+	sleep 5
+	echo "Sending Magic Packet"
+	/usr/bin/wakeonlan 00:1a:64:23:e5:30 & 
+}
+
+function powerOFF {
+	echo "Powering Off System"
+	ssh -o "ServerAliveInterval 2" iainstott@192.168.0.6 'sudo poweroff -f'
+}
+
+function turnOFF {
+	echo "Turning Off Power"
+	/usr/local/bin/gpio write 1 1
+}
+
+function remoteOFF {
+	powerOFF
+	sleep 60
+	turnOFF
+}
+	
+function cron {
+	turnON
+	timer Start
+	echo "Sorting IPTV"
+	ssh iainstott@192.168.0.6 'source /home/iainstott/GitRepo/Scripts/lib/bash/kodiSORTIPTV; kodiSORTIPTV_Process'
+	echo "Running Backup Process"
+	ssh iainstott@192.168.0.6 'rsync -avzP /media/Backup_NET/	/media/Backup/'
+	powerOFF
+	timer Stop
+	turnOff
+}

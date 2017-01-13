@@ -58,6 +58,8 @@ function kodiSORTIPTV_ProcessEnd {
 	then
 		/usr/bin/mono ${kodiLOCAL}"WebGrab/WebGrab+Plus.exe" ${kodiLOCAL}"WebGrab/"
 		/usr/bin/mono ${kodiLOCAL}"WebGrab/WebGrab+Plus.exe" ${kodiLOCAL}"MegaWEBGRAB/"
+		cp ${kodiLOCAL}"IPTVLists/guide.xml" ${kodiLOCAL}"guide.xml"
+		cp ${kodiLOCAL}"MegaWEBGRAB/guide.xml" ${kodiLOCAL}"megaguide.xml"
 	fi
 	if [ ${hostname} == ${server} ] || [ ${hostname} == ${bladeserver} ]
 	then

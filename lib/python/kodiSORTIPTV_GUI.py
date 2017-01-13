@@ -16,6 +16,7 @@ fileHEADER="#EXTM3U"
 lineSTART="#EXTINF:-1,"
 webgrabCONFIG="WebGrab/WebGrab++.config.xml"
 webgrabSTART="WebGrab/config.start"
+webgrabEND="WebGrab/config.end"
 
 
 mychannelsDICT={}
@@ -162,6 +163,10 @@ def buildGUIDE ():
 					idnumber=(value[4])
 					guideLINE='	<channel update="'+'i'+'" site="'+site+'" site_id="'+idnumber+'" xmltv_id="'+name+'">'+name+'</channel>'
 					config.write(guideLINE+'\n')
+			with open(webgrabEND, 'r') as end:
+				lines=end.readlines()
+				for line in lines:
+					config.write(line)
 			config.write("</settings>")
 		config.close()
 		
