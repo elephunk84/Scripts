@@ -18,7 +18,7 @@ ssh iainstott@192.168.0.6 'source /home/iainstott/GitRepo/Scripts/lib/bash/kodiS
 echo "Running Backup Process"
 ssh iainstott@192.168.0.6 'rsync -avzP /media/Backup_NET/	/media/Backup/'
 echo "Powering Off System"
-ssh iainstott@192.168.0.6 'sudo poweroff; exit'
+ssh iainstott@192.168.0.6 'sudo poweroff -f'
 for ((i=delay; i>=1; i--)); do
 	echo "Waiting For BladeServer to Stop"
 	echo "Please wait .... $i Seconds"

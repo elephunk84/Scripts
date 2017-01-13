@@ -129,6 +129,16 @@ function backupRoutine_removeOLD {
     done
 }
 
+function backupRoutine_syncNextCloud {
+    echo "Now processing NextCloud"
+    rsync -aAXHv /media/Backup_NET/Eloras/Eloras\ Laptop/ /media/Websites_NET/nextCloud/data/elorabryan/files/Documents/
+	rsync -aAXHv /media/Websites_NET/nextCloud/data/elorabryan/files/Documents/ /media/Backup_NET/Eloras/Eloras\ Laptop/ 
+    rsync -aAXHv /media/Backup_NET/Iains /media/Websites_NET/nextCloud/data/iainstott/files/Documents/
+	rsync -aAXHv /media/Websites_NET/nextCloud/data/iainstott/files/ /media/Backup_NET/Iains/
+	cd /media/Websites_NET/nextCloud
+	sudo -u apache php occ files:scan --all 
+}
+
 function backupRoutine_backupWEEKLY {
     backupRoutine_backupDAILY
     cd ${NFSShare}
