@@ -26,7 +26,7 @@ fi
 			
 function localMenuGUI {
     date=$(date +%d-%m-%Y_%H:%M)
-    choice=$(zenity --list --text "Local Machine Menu" --height=500 --width=400 --radiolist --column "Pick" --column "options" FALSE "Install Program" FALSE "Edit Local Files" FALSE "Servers Menu" FALSE "Backup Home Folder" FALSE "Backup System" FALSE "Kodi Menu" FALSE "Android Menu" FALSE "Burn USB ISO" FALSE "Launch Tor Browser" FALSE "Tor Browser Over Tor Proxy" FALSE "VPN Connections")
+    choice=$(zenity --list --text "Local Machine Menu" --height=500 --width=400 --radiolist --column "Pick" --column "options" FALSE "Install Program" FALSE "Edit Local Files" FALSE "Servers Menu" FALSE "Backup Home Folder" FALSE "Backup System" FALSE "Kodi Menu" FALSE "Android Menu" FALSE "Burn USB ISO" FALSE "Launch Tor Browser" FALSE "Tor Browser Over Tor Proxy"  FALSE "YouTube Downloader" FALSE "VPN Connections")
     case $choice in
 		"Backup Home Folder")
 			cmd='xterm -e "rsync -aAXHv --delete-during ${homeLOCAL} ${homeREMOTE}"'
@@ -63,7 +63,7 @@ function localMenuGUI {
 			burnISOGUI
 			;;
 		"Servers Menu")
-			terminator -p netMenu --geometry=900x530
+			serversMenuGUI
 			;;
 		"Restart Servers")
 			command='restart'
@@ -116,6 +116,11 @@ function localMenuGUI {
 						nmcli c down id HomeVPN
 						;;
 				esac
+			;;
+		"YouTube Dowloader")
+			cd ~/Downloads
+			url=$(zenity --entry --text "Video To Download" --entry-text "http://youtube.com")
+			xterm -e "youtube-dl ${url}"
 			;;
 	esac
 }
