@@ -1,3 +1,4 @@
 #!/bin/bash
 
 ssh iainstott@192.168.0.2 'source /home/iainstott/GitRepo/Scripts/lib/bash/backupRoutine; backupRoutine_backupDAILY'
+ssh iainstott@192.168.0.2 'source /home/iainstott/GitRepo/Scripts/lib/bash/kodisortIPTV; kodiSORTIPTV_Process'

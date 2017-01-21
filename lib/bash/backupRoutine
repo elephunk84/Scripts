@@ -2,13 +2,13 @@
 
 daily="/daily/"
 archive="/archive/"
-backupDir2="/media/Backup_Drive/"
-backupDir="/media/Storage_Drive/Backup/"
-softwareDir="/media/Storage_Drive/Storage/"
-dataDir="/media/Data_Drive/"
-NFSShare="/media/Backup_NET/"
-NFSSoftware="/media/Software_NET/"
-GitRepo="/media/Backup_NET/GitRepo/"
+backupDir2="/media/LOCAL/BackupDrive/"
+backupDir="/media/LOCAL/StorageDrive/Backup/"
+softwareDir="/media/LOCAL/DataDrive/Software"
+dataDir="/media/LOCAL/DataDrive/"
+NFSShare="/media/NFS/Backup/"
+NFSSoftware="/media/NFS/Software/"
+GitRepo="/media/NFS/Backup/GitRepo/"
 logsDir="${NFSShare}logs/"
 
 raspi1=('192.168.0.4' 'Raspi-1' 'root')
@@ -22,6 +22,7 @@ raspi7=('192.168.0.131' 'Raspi-7' 'root')
 declare machines=( "${raspi1[0]}" "${raspi2[0]}" "${raspi3[0]}" "${raspi4[0]}" "${raspi6[0]}" "${raspi7[0]}")
 
 command='sshpass -p "3L3phunk84%" rsync -aAXHv --delete-during --exclude-from=/home/iainstott/GitRepo/Scripts/lib/rsync_exclude.txt '
+command2='sshpass -p "3L3phunk84%" rsync -aAXHv --exclude-from=/home/iainstott/GitRepo/Scripts/lib/rsync_exclude.txt '
 
 THRESHOLD=$(date -d "46 days ago" +%d-%m-%Y_%H:%M)
 DELETE_OTHERS="yes"
@@ -94,8 +95,7 @@ function backupRoutine_backupNFSShare {
 function backupRoutine_backupSoftwareNET {
     echo "Now processing NFSSoftware"
     touch ${logsDir}NFSSoftware_${date}.log
-    ${command} --log-file=${logsDir}NFSSoftware_${date}.log ${NFSSoftware} ${softwareDir} 2>&1 >/dev/null
-	${command2} --log-file=${logsDir}DATADIR_${date}.log ${softwareDir} ${dataDir} 2>&1 >/dev/null
+    ${command2} --log-file=${logsDir}NFSSoftware_${date}.log ${NFSSoftware} ${dataDir} 2>&1 >/dev/null
 }
 
 function backupRoutine_backupRPIS {
