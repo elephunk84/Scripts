@@ -3,7 +3,7 @@
 cd /home/iainstott/GitRepo/Scripts
 
 hostname=$(hostname)
-server='physical-server'
+server='alienserver'
 bladeserver='bladeserver'
 kodiHOME='/home/iainstott/.kodi/'
 kodiLOCAL='/home/iainstott/Kodi/'
@@ -30,11 +30,7 @@ five=( '5' 'five' )
 hd=( 'hd' '720' '1080p' '1080' )
 
 function kodiSORTIPTV_ProcessStart {
-	if [ ${hostname} == ${server} ] || [ ${hostname} == ${bladeserver} ]
-	then
-		kodiREMOTE='/media/Backup_NET/Iains/KodiRepo/'
-		sudo rsync -avP --delete-during /media/Backup_NET/Iains/KodiRepo/ /home/iainstott/Kodi/
-	fi
+	rsync -avP --delete-during /media/NFS/Backup/Iains/KodiRepo/ /home/iainstott/Kodi/
 	rm -rf ${kodiLOCAL}"IPTVLists/Archive/${DATE}_1.m3u"
 	rm -rf ${kodiLOCAL}"IPTVLists/Archive/${DATE}_2.m3u"
 	rm -rf ${IPTVChannelList}
@@ -63,7 +59,7 @@ function kodiSORTIPTV_ProcessEnd {
 	fi
 	if [ ${hostname} == ${server} ] || [ ${hostname} == ${bladeserver} ]
 	then
-		rsync -azvP --delete-during /home/iainstott/Kodi/ /media/Backup_NET/Iains/KodiRepo/
+		rsync -azvP --delete-during /home/iainstott/Kodi/ /media/NFS/Backup/Iains/KodiRepo/
 	fi
 }
 
