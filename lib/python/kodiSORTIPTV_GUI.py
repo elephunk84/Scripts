@@ -67,24 +67,31 @@ def buildDICTIONARIES ():
 					line=line.replace("| ", "  | ")
 					line=line.replace(" l ", " | ")
 					line=line.replace("DE ", "DE | ")
-					line=line.replace("24/7 ", "24/7  | ")
-					line=line.replace("Adult ", "XXX  | Adult ")
+					line=line.replace("24-7 ", "24/7  | ")
 					if "Five" not in line:
 						line=line.replace("USA", "USA | ")
 					else:
 						line=line
 					line2=(' '.join(line.split()))
 					line2=line2.replace("USA | |", "USA |")
+					line2=line2.replace("24/7 | |", "24/7 |")
 					line2=line2.replace("DE | |", "DE |")
 					line2=line2.replace("VIP USA", "VIP")
 					if "|" not in line2:
 						line3=("VOD | "+line2)
 					else:
 						line3=line2
-					channelsfile.write(line3+'\n')
 					name=line3.rstrip('\n')
-					name=name.split('| ',1)[1]
-					availchannelsDICT[name]=m3ulink
+					chname=name.split('| ',1)[1]
+					if chname in mychannelsDICT:
+						line4=(line3+" | GOT")
+					else:
+						line4=line3
+					if '*****' in line3:
+						pass
+					else:
+						channelsfile.write(line4+'\n')
+					availchannelsDICT[chname]=m3ulink
 				except IndexError:
 					pass
 				continue

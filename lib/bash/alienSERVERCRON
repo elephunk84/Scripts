@@ -1,4 +1,18 @@
 #!/bin/bash
 
-ssh iainstott@192.168.0.2 'source /home/iainstott/GitRepo/Scripts/lib/bash/backupRoutine; backupRoutine_backupDAILY'
-ssh iainstott@192.168.0.2 'source /home/iainstott/GitRepo/Scripts/lib/bash/kodiSORTIPTV; kodiSORTIPTV_Process'
+function BACKUP {
+	ssh root@192.168.0.6 'source /home/iainstott/GitRepo/Scripts/lib/bash/backupRoutine; backupRoutine_backupDAILY'
+}
+
+function IPTV {
+	ssh root@192.168.0.6 'source /home/iainstott/GitRepo/Scripts/lib/bash/kodiSORTIPTV; kodiSORTIPTV_Process'
+}
+
+function ISO {
+	ssh root@192.168.0.6 '/home/iainstott/GitRepo/Scripts/lib/bash/findiso.sh'
+}
+
+function CRON {
+	BACKUP
+	IPTV
+}

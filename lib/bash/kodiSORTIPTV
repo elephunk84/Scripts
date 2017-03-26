@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /home/iainstott/GitRepo/Scripts
+cd /mnt/LOCAL/Backup/BackupFolder/Backup/GitRepo/Scripts
 
 hostname=$(hostname)
 server='alienserver'
@@ -8,7 +8,7 @@ bladeserver='bladeserver'
 kodiHOME='/home/iainstott/.kodi/'
 kodiLOCAL='/home/iainstott/Kodi/'
 kodiLOCALCURRENT=${kodiLOCAL}"currentBuild/"
-kodiREMOTE='/media/Backup/Iains/KodiRepo/'
+kodiREMOTE='/mnt/LOCAL/Backup/BackupFolder/Backup/Iains/KodiRepo/'
 kodiREMOTECURRENT=${kodiREMOTE}"currentBuild/"
 kodiRESET=${kodiLOCAL}"reset.tgz"
 kodiCURRENT=${kodiLOCAL}"current.tgz"
@@ -30,7 +30,7 @@ five=( '5' 'five' )
 hd=( 'hd' '720' '1080p' '1080' )
 
 function kodiSORTIPTV_ProcessStart {
-	rsync -avP --delete-during /media/NFS/Backup/Iains/KodiRepo/ /home/iainstott/Kodi/
+	rsync -avP --delete-during /mnt/LOCAL/Backup/BackupFolder/Backup/Iains/KodiRepo/ /home/iainstott/Kodi/
 	rm -rf ${kodiLOCAL}"IPTVLists/Archive/${DATE}_1.m3u"
 	rm -rf ${kodiLOCAL}"IPTVLists/Archive/${DATE}_2.m3u"
 	rm -rf ${IPTVChannelList}
@@ -44,6 +44,8 @@ function kodiSORTIPTV_ProcessStart {
 	n=1
 	DATE=$(date +%d-%m-%y)
 	wget -O ${kodiLOCAL}"IPTVLists/Archive/${DATE}_1.m3u" "http://uk-mega-iptv.is-found.org:25461/get.php?username=IainStott&password=QAcEiPTJsK&type=m3u&output=ts"
+	wget -O ${kodiLOCAL}"plugin.video.megaiptv.zip" "https://megaiptv.co/dl.php?type=d&id=1"
+	wget -O ${kodiLOCAL}"megaiptv.apk" "https://megaiptv.co/dl.php?type=d&id=5"
 	}
 
 function kodiSORTIPTV_ProcessEnd {
@@ -53,13 +55,11 @@ function kodiSORTIPTV_ProcessEnd {
 	if [ ${updateGUIDE} == 'YES' ]
 	then
 		/usr/bin/mono ${kodiLOCAL}"WebGrab/WebGrab+Plus.exe" ${kodiLOCAL}"WebGrab/"
-		/usr/bin/mono ${kodiLOCAL}"WebGrab/WebGrab+Plus.exe" ${kodiLOCAL}"MegaWEBGRAB/"
 		cp ${kodiLOCAL}"IPTVLists/guide.xml" ${kodiLOCAL}"guide.xml"
-		cp ${kodiLOCAL}"MegaWEBGRAB/guide.xml" ${kodiLOCAL}"megaguide.xml"
 	fi
-	if [ ${hostname} == ${server} ] || [ ${hostname} == ${bladeserver} ]
+    if [ ${hostname} == ${server} ] || [ ${hostname} == ${bladeserver} ]
 	then
-		rsync -azvP --delete-during /home/iainstott/Kodi/ /media/NFS/Backup/Iains/KodiRepo/
+		rsync -azvP --delete-during /home/iainstott/Kodi/ /mnt/LOCAL/Backup/BackupFolder/Backup/Iains/KodiRepo/
 	fi
 }
 

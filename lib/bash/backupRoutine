@@ -2,27 +2,27 @@
 
 daily="/daily/"
 archive="/archive/"
-backupDir2="/media/LOCAL/BackupDrive/"
-backupDir="/media/LOCAL/StorageDrive/Backup/"
-softwareDir="/media/LOCAL/DataDrive/Software"
-dataDir="/media/LOCAL/DataDrive/"
-NFSShare="/media/NFS/Backup/"
-NFSSoftware="/media/NFS/Software/"
-GitRepo="/media/NFS/Backup/GitRepo/"
+backupDir2="/mnt/LOCAL/Backup_Drive/"
+backupDir="/mnt/LOCAL/Storage_Drive/Backup/"
+softwareDir="/mnt/LOCAL/Data_Drive/Software"
+dataDir="/mnt/LOCAL/DataDrive/"
+NFSShare="/mnt/NFS/Backup/"
+NFSSoftware="/mnt/NFS/Software/"
+GitRepo="/mnt/LOCAL/Backup/BackupFolder/Backup/GitRepo/"
 logsDir="${NFSShare}logs/"
 
-raspi1=('192.168.0.4' 'Raspi-1' 'root')
-raspi2=('192.168.1.2' 'Raspi-2' 'root')
-raspi3=('192.168.1.3' 'Raspi-3' 'root')
-raspi4=('192.168.1.4' 'Raspi-4' 'root')
-raspi5=('192.168.0.5' 'Raspi-5' 'root')
-raspi6=('192.168.0.130' 'Raspi-6' 'root')
-raspi7=('192.168.0.131' 'Raspi-7' 'root')
+raspi1=('192.168.0.4' 'Raspi-1' 'root' '3L3phunk84%')
+raspi2=('192.168.1.2' 'Raspi-2' 'osmc' 'osmc')
+raspi3=('192.168.1.3' 'Raspi-3' 'pi' '3L3phunk84%')
+raspi4=('192.168.1.4' 'Raspi-4' 'iainstott' '3L3phunk84%')
+raspi5=('192.168.0.5' 'Raspi-5' 'pi' '3L3phunk84%')
+raspi6=('192.168.0.130' 'Raspi-6' 'osmc' 'osmc')
+raspi7=('192.168.0.131' 'Raspi-7' 'root' '3L3phunk84%')
 
 declare machines=( "${raspi1[0]}" "${raspi2[0]}" "${raspi3[0]}" "${raspi4[0]}" "${raspi6[0]}" "${raspi7[0]}")
 
-command='sshpass -p "3L3phunk84%" rsync -aAXHv --delete-during --exclude-from=/home/iainstott/GitRepo/Scripts/lib/rsync_exclude.txt '
-command2='sshpass -p "3L3phunk84%" rsync -aAXHv --exclude-from=/home/iainstott/GitRepo/Scripts/lib/rsync_exclude.txt '
+command='rsync -aAXHvP --delete-during --exclude-from=/mnt/NFS/Backup/GitRepo/Scripts/lib/rsync_exclude.txt '
+command2='rsync -aAXHv --exclude-from=/mnt/NFS/Backup/GitRepo/Scripts/lib/rsync_exclude.txt '
 
 THRESHOLD=$(date -d "46 days ago" +%d-%m-%Y_%H:%M)
 DELETE_OTHERS="yes"
@@ -30,7 +30,7 @@ DELETE_OTHERS="yes"
 function backupRoutine_RASPI1 {
     echo "Now processing Raspi-1"
     touch ${logsDir}${raspi1[1]}_${date}.log
-    ${command} --log-file=${logsDir}${raspi1[1]}_${date}.log ${raspi1[2]}@${raspi1[0]}:/ ${NFSShare}/${raspi1[1]}${daily} 2>&1 >/dev/null
+    sshpass -p ${raspi1[3]} ${command} --log-file=${logsDir}${raspi1[1]}_${date}.log ${raspi1[2]}@${raspi1[0]}:/ ${NFSShare}/${raspi1[1]}${daily} 2>&1 >/dev/null
 }
 function backupRoutine_RASPI2 {
     echo "Now processing Raspi-2"
@@ -106,7 +106,7 @@ function backupRoutine_backupRPIS {
     backupRoutine_RASPI4
 	backupRoutine_RASPI5
     backupRoutine_RASPI6
-    backupRoutine_RASPI7
+    #backupRoutine_RASPI7
 }
 function backupRoutine_backupDAILY {
     backupRoutine_backupRPIS

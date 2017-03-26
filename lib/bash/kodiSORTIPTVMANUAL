@@ -5,11 +5,7 @@ server='physical-server'
 kodiHOME='/home/iainstott/.kodi/'
 kodiLOCAL='/home/iainstott/Kodi/'
 kodiLOCALCURRENT=${kodiLOCAL}"currentBuild/"
-kodiREMOTE='/media/Backup/Iains/KodiRepo/'
-if [ ${hostname} == ${server} ]
-then
-	kodiREMOTE='/media/Backup_NET/Iains/KodiRepo'
-fi
+kodiREMOTE='/mnt/Backup_Drive/BackupFolder/Backup/Iains/KodiRepo/'
 kodiREMOTECURRENT=${kodiREMOTE}"currentBuild/"
 kodiRESET=${kodiLOCAL}"reset.tgz"
 kodiCURRENT=${kodiLOCAL}"current.tgz"

@@ -1,0 +1,60 @@
+#!/bin/bash
+
+choice=$(zenity --list --text "Chromium Browser" --height=500 --width=400 --radiolist --column "Pick" --column "Site" \
+TRUE "Secret Site" \
+FALSE "HomeSecret" \
+FALSE "FabGuys" \
+FALSE "FabSwingers" \
+FALSE "PornHub" \
+FALSE "DinoTube" \
+FALSE "DinoTube Pouplar" \
+FALSE "DinoTube Anal Compilation" \
+FALSE "DinoTube Compilation" \
+FALSE "DinoTube Teen" \
+FALSE "DinoTube Teen Anal" \
+FALSE "DinoTube Beauty" \
+FALSE "DinoTube Lesbian" \
+ )
+case $choice in
+    "Secret Site")
+		options=" http://secret.iaincstott.co.uk/"
+		;;
+    "HomeSecret")
+		options=" http://192.168.0.159:8000"
+		;;
+    "FabGuys")
+		options=" fabguys.com"
+        ;;
+    "FabSwingers")
+		options=" fabswingers.co.uk"
+        ;;
+    "PornHub")
+		options=" pornhub.com"
+        ;;
+    "DinoTube")
+        options=" dinotube.com"
+		;;
+    "DinoTube Anal Compilation")
+        options=" http://www.dinotube.com/category/anal-compilation?filter%5Border_by%5D=duration&filter%5Bpublished%5D%5Bmin%5D=&filter%5Bduration%5D%5Bmin%5D=1200&filter%5Bquality%5D=&filter%5Badvertiser_site%5D=&filter%5Btag_list%5D%5Borientation%5D="
+		;;
+    "DinoTube Teen")
+        options=" dinotube.com/category/teen-18-19"
+		;;
+    "DinoTube Teen Anal")
+        options=" http://dinotube.com/category/teen-anal-sex-18-19?filter%5Border_by%5D=popular&filter%5Bpublished%5D%5Bmin%5D=&filter%5Bduration%5D%5Bmin%5D=1200&filter%5Bquality%5D=&filter%5Badvertiser_site%5D=&filter%5Btag_list%5D%5Borientation%5D="
+		;;
+    "DinoTube Popular")
+        options=" http://dinotube.com/category/popular"
+		;;
+    "DinoTube Beauty")
+		options=" http://www.dinotube.com/category/beauty?filter%5Border_by%5D=duration&filter%5Bpublished%5D%5Bmin%5D=&filter%5Bduration%5D%5Bmin%5D=1200&filter%5Bquality%5D=&filter%5Badvertiser_site%5D=&filter%5Btag_list%5D%5Borientation%5D="
+		;;
+    "DinoTube Lesbian")
+		options="http://www.dinotube.com/category/lesbian"
+		;;
+    "DinoTube Compilation")
+		options="http://www.dinotube.com/category/compilation?filter%5Border_by%5D=duration&filter%5Bpublished%5D%5Bmin%5D=&filter%5Bduration%5D%5Bmin%5D=1200&filter%5Bquality%5D=&filter%5Badvertiser_site%5D=&filter%5Btag_list%5D%5Borientation%5D="
+		;;
+esac
+
+chromium ${options}

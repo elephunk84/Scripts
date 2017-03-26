@@ -1,0 +1,4 @@
+#!/bin/bash
+
+source /mnt/LOCAL/Backup/BackupFolder/Backup/GitRepo/Scripts/lib/bash/kodiSORTIPTV; kodiSORTIPTV_Process
+rsync -avzP /home/iainstott/Kodi/ /mnt/LOCAL/Backup/BackupFolder/Backup/Iains/KodiRepo/

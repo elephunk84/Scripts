@@ -1,5 +1,7 @@
 #!/bin/bash
 
+IFS=$' '
+
 raspi1='192.168.0.1'
 raspi2='192.168.1.2'
 raspi3='192.168.1.3'
@@ -11,11 +13,13 @@ server='192.168.0.2'
 bladeserver='192.168.0.5'
 
 serverList=('Raspi-1' 'Raspi-2' 'Raspi-3' 'Raspi-4' 'Raspi-5' 'Raspi-6' 'Rasp-7' 'Server' 'BladeServer' )
-actionsList=('SSH_Server' 'Restart' 'Shutdown' 'Edit_Files' 'Restart_Services')
+actionsList=('SSH Server' 'Restart' 'Shutdown' 'Edit Files' 'Restart Services')
 
 file_rclocal='/etc/rc.local'
+file_screenrc='/etc/screenrc'
 file_fstab='/etc/fstab'
 file_bashrc='/.bashrc'
+file_exports='/etc/exports'
 
 command_ssh='ssh -Y ${user}@{ipaddress}'
 command_restart="ssh -Y ${user}@{ipaddress} 'sudo reboot'"
@@ -24,21 +28,22 @@ command_manualcommand="ssh -Y ${user}@{ipaddress} ${manualcommand}"
 
 ###Start Of Script
 ###Generate GUI Lists
-serverListGUI=''
+serverListGUI=()
 for host in ${serverList[*]}; do
 	serverListGUI+='FALSE '
 	serverListGUI+=$host' '
 done
-actionsListGUI=''
+actionsListGUI=()
 for action in ${actionsList[*]}; do
 	actionsListGUI+='FALSE '
 	actionsListGUI+=$action' '
 done
 
 
+
 ###MAIN MENU
 function serversMenuGUI {
-	action=$(yad --title="Servers Menu" --width=500 --height=500 --list --checklist  --item-separator=" " --column=Select --column=Server ${actionsListGUI[*]})
+	action=$(yad --title="Servers Menu" --width=500 --height=500 --list --checklist  --item-separator=" " --column=Select --column=Server ${actionsListGUI[@]})
 	case $action in
 		"SSH_Server")
 			server=$(yad --title="Servers List" --width=500 --height=500 --list --checklist  --item-separator=" " --column=Select --column=Server ${serverListGUI[*]})
