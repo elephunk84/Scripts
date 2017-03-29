@@ -14,6 +14,8 @@ FALSE "DinoTube Teen" \
 FALSE "DinoTube Teen Anal" \
 FALSE "DinoTube Beauty" \
 FALSE "DinoTube Lesbian" \
+FALSE "LoveHoney" \
+FALSE "ExtremeRestraints" \
  )
 case $choice in
     "Secret Site")
@@ -33,6 +35,12 @@ case $choice in
         ;;
     "DinoTube")
         options=" dinotube.com"
+		;;
+    "LoveHoney")
+		options=" lovehoney.co.uk"
+        ;;
+    "ExtremeRestraints")
+        options=" extremerestraints.com"
 		;;
     "DinoTube Anal Compilation")
         options=" http://www.dinotube.com/category/anal-compilation?filter%5Border_by%5D=duration&filter%5Bpublished%5D%5Bmin%5D=&filter%5Bduration%5D%5Bmin%5D=1200&filter%5Bquality%5D=&filter%5Badvertiser_site%5D=&filter%5Btag_list%5D%5Borientation%5D="
