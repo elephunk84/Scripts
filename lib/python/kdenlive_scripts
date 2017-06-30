@@ -1,0 +1,101 @@
+#!/bin/python3
+
+import os, subprocess, glob, string, random
+
+scriptsDIR='/home/iainstott/kdenlive/scripts/'
+workingDIR='/home/iainstott/kdenlive/clips/'
+
+archiveDIR='/mnt/LOCAL/PrivStore/Videos/Clips/'
+myVids=(archiveDIR+'001-MyVids/')
+myClips=(archiveDIR+'001-MyClips/')
+analClips=(archiveDIR+'002-Anal_Clips/')
+teenClips=(archiveDIR+'002-Teen_Clips/')
+lesbianClips=(archiveDIR+'002-Lesbian_Clips/')
+gangbangClips=(archiveDIR+'002-Gangbang_Clips/')
+squirtClips=(archiveDIR+'002-Squirt_Clips/')
+orgasmClips=(archiveDIR+'002-Orgasm_Clips/')
+redheadClips=(archiveDIR+'002-Redhead_Clips/')
+bisexClips=(archiveDIR+'002-Bisex_Clips/')
+cumshotClips=(archiveDIR+'002-Cumshot_Clips/')
+blowjobClips=(archiveDIR+'002-BlowJob_Clips/')
+pornstarClips=(archiveDIR+'002-PornStar_Clips/')
+acrobaticClips=(archiveDIR+'002-Acrobatic_Clips/')
+machineClips=(archiveDIR+'002-Machine_Clips/')
+
+catLIST={"myvids":[myVids], "myclips":[myClips], "pornstar":[pornstarClips],"machine":[machineClips], "acrobatic":[acrobaticClips], "blowjob":[blowjobClips], "anal":[analClips], "teen":[teenClips], "lesbian":[lesbianClips], "gangbang":[gangbangClips], "squirt":[squirtClips],"cumshot":[cumshotClips], "redhead":[redheadClips], "orgasm":[orgasmClips], "bisex":[bisexClips]}
+
+dirLIST=[]
+
+scriptsLIST=glob.glob(scriptsDIR+"*.sh")
+
+nameforvideo=''
+
+def runSCRIPTS():
+    for script in scriptsLIST:
+        scriptNAME=script.split("/", 5)[5]
+        scriptNAME=scriptNAME.split("_", 1)[0]
+        scriptNAME=scriptNAME.lower()
+        for k in catLIST:
+            if k in scriptNAME:
+                for v in catLIST[k]:
+                    archiveDIR=v
+        subprocess.call(script, shell=True, executable="/bin/bash")
+        try:
+            os.stat(archiveDIR)
+        except:
+            os.mkdir(archiveDIR)
+        with open(script) as f:
+            for line in f:
+                if ( workingDIR in line ):
+                    line=line.split("=", 1)[1]
+                    source=line[1:-2]
+                    destNAME=source.split("/", 5)[5]
+                    if "un31.mp4" not in destNAME:
+                        if "un29.mp4" not in destNAME:    
+                            newfile=destNAME.split(".", 1)[0]
+                            newfile=newfile.lower()
+                            newfile=os.path.join(workingDIR, newfile+".mp4")
+                            target=os.path.join(archiveDIR, newfile+".mp4")
+                        else:
+                            nameforvideo=(id_generator())
+                            newfile=os.path.join(workingDIR, nameforvideo+".mp4")
+                            target=os.path.join(archiveDIR, nameforvideo+".mp4")
+                    else:
+                        nameforvideo=(id_generator())
+                        newfile=os.path.join(workingDIR, nameforvideo+".mp4")
+                        target=os.path.join(archiveDIR, nameforvideo+".mp4")
+                else:
+                    pass
+        copyCMD="/bin/cp -a "+source+" "+target
+        subprocess.call(copyCMD, shell=True)
+        MP4S=glob.glob(workingDIR+"*.mp4")
+        os.remove(script)
+        os.remove(script+".mlt")
+        for mp4 in MP4S:
+            os.remove(mp4)
+        
+def id_generator(size=32, chars=string.ascii_uppercase + string.digits + string.ascii_lowercase):
+    return ''.join(random.choice(chars) for _ in range(size))
+        
+def randomARCHIVES():
+    for k in catLIST:
+        for v in catLIST[k]:
+            dirLIST.append(v)
+    for d in dirLIST:
+        if d == myVids:
+            pass
+        else:
+            try:
+                dirlist=glob.glob(d+"*.mp4")
+                for video in dirlist:
+                    nameforvideo=(id_generator())
+                    newname=os.path.join(d, nameforvideo+".mp4")
+                    os.rename(video, newname)
+            except:
+                pass
+            subprocess.call("fdupes -dN "+d, shell=True)
+
+    
+if __name__ == "__main__":
+    runSCRIPTS()
+    randomARCHIVES()

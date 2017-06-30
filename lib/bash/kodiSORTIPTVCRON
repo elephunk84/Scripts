@@ -1,9 +1,0 @@
-#!/bin/bash
-
-/usr/local/bin/gpio write 1 0
-sleep 10
-/usr/bin/wakeonlan 00:1a:64:23:e5:30 
-sleep 600
-ssh iainstott@192.168.0.6 'source /home/iainstott/GitRepo/lib/bash/kodiSORTIPTV; kodiSORTIPTV_ProcessRemote'
-sleep 600
-/usr/local/bin gpio write 1 1

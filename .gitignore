@@ -1,0 +1,5 @@
+lib/gui/private.py 
+lib/gui/data/privatefile.txt
+lib/gui/data/PIA_VPN.conf
+lib/gui/data/VPN.cert
+

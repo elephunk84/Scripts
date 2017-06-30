@@ -1,0 +1,115 @@
+# Tor state file last generated on 2017-02-18 08:35:47 local time
+# Other times below are in UTC
+# You *do not* need to edit this file.
+
+EntryGuard IWorshipHisShadow 91E4015E1F82DAF0121D62267E54A1F661AB6DC7 DirCache
+EntryGuardAddedBy 91E4015E1F82DAF0121D62267E54A1F661AB6DC7 0.2.8.11 2016-12-03 15:54:37
+EntryGuardPathBias 164.000000 163.000000 163.000000 0.000000 0.000000 3.000000
+EntryGuardPathUseBias 61.000000 61.000000
+EntryGuard henkdefriemel 4CD4DFFEF3971C902A22100D911CAC639BE2EF5C DirCache
+EntryGuardAddedBy 4CD4DFFEF3971C902A22100D911CAC639BE2EF5C 0.2.8.11 2016-12-04 15:10:46
+EntryGuard Unnamed FFCC9FB956748CEFFCA73FDAD91A7D7AB4DADCDE DirCache
+EntryGuardAddedBy FFCC9FB956748CEFFCA73FDAD91A7D7AB4DADCDE 0.2.8.11 2016-12-23 04:19:43
+EntryGuardPathBias 100.000000 98.000000 98.000000 0.000000 0.000000 1.000000
+EntryGuardPathUseBias 70.000000 70.000000
+EntryGuard redjohn1 387B065A38E4DAA16D9D41C2964ECBC4B31D30FF DirCache
+EntryGuardAddedBy 387B065A38E4DAA16D9D41C2964ECBC4B31D30FF 0.2.8.11 2016-12-21 18:10:36
+EntryGuard janschejbalScaleWy2 2A4C448784F5A83AFE6C78DA357D5E31F7989DEB DirCache
+EntryGuardAddedBy 2A4C448784F5A83AFE6C78DA357D5E31F7989DEB 0.2.8.11 2016-12-23 19:55:16
+EntryGuard HBkjhcbekjYHKGVJig 85650B41E664AC64793A1D3A1E5B14884BDF609B DirCache
+EntryGuardDownSince 2016-12-30 21:04:07 2016-12-30 21:04:07
+EntryGuardUnlistedSince 2017-02-16 20:42:27
+EntryGuardAddedBy 85650B41E664AC64793A1D3A1E5B14884BDF609B 0.2.8.11 2016-12-10 21:33:04
+TorVersion Tor 0.2.9.9 (git-56788a2489127072)
+LastWritten 2017-02-18 08:35:47
+TotalBuildTimes 256
+CircuitBuildTimeBin 125 1
+CircuitBuildTimeBin 175 4
+CircuitBuildTimeBin 225 9
+CircuitBuildTimeBin 275 4
+CircuitBuildTimeBin 325 2
+CircuitBuildTimeBin 375 1
+CircuitBuildTimeBin 575 1
+CircuitBuildTimeBin 675 1
+CircuitBuildTimeBin 725 1
+CircuitBuildTimeBin 775 3
+CircuitBuildTimeBin 875 4
+CircuitBuildTimeBin 925 2
+CircuitBuildTimeBin 975 1
+CircuitBuildTimeBin 1025 2
+CircuitBuildTimeBin 1075 3
+CircuitBuildTimeBin 1125 5
+CircuitBuildTimeBin 1175 1
+CircuitBuildTimeBin 1325 1
+CircuitBuildTimeBin 1375 1
+CircuitBuildTimeBin 1425 3
+CircuitBuildTimeBin 1475 7
+CircuitBuildTimeBin 1525 3
+CircuitBuildTimeBin 1575 4
+CircuitBuildTimeBin 1625 3
+CircuitBuildTimeBin 1675 3
+CircuitBuildTimeBin 1725 7
+CircuitBuildTimeBin 1775 4
+CircuitBuildTimeBin 1825 3
+CircuitBuildTimeBin 1875 1
+CircuitBuildTimeBin 1925 4
+CircuitBuildTimeBin 1975 1
+CircuitBuildTimeBin 2025 3
+CircuitBuildTimeBin 2075 1
+CircuitBuildTimeBin 2125 6
+CircuitBuildTimeBin 2175 6
+CircuitBuildTimeBin 2225 2
+CircuitBuildTimeBin 2275 7
+CircuitBuildTimeBin 2325 2
+CircuitBuildTimeBin 2375 2
+CircuitBuildTimeBin 2425 2
+CircuitBuildTimeBin 2475 3
+CircuitBuildTimeBin 2525 5
+CircuitBuildTimeBin 2575 5
+CircuitBuildTimeBin 2625 4
+CircuitBuildTimeBin 2675 4
+CircuitBuildTimeBin 2725 5
+CircuitBuildTimeBin 2775 2
+CircuitBuildTimeBin 2825 4
+CircuitBuildTimeBin 2875 2
+CircuitBuildTimeBin 2925 1
+CircuitBuildTimeBin 2975 4
+CircuitBuildTimeBin 3025 5
+CircuitBuildTimeBin 3075 4
+CircuitBuildTimeBin 3125 4
+CircuitBuildTimeBin 3175 3
+CircuitBuildTimeBin 3225 4
+CircuitBuildTimeBin 3275 1
+CircuitBuildTimeBin 3325 3
+CircuitBuildTimeBin 3375 1
+CircuitBuildTimeBin 3425 3
+CircuitBuildTimeBin 3475 3
+CircuitBuildTimeBin 3525 5
+CircuitBuildTimeBin 3575 3
+CircuitBuildTimeBin 3625 3
+CircuitBuildTimeBin 3675 4
+CircuitBuildTimeBin 3725 2
+CircuitBuildTimeBin 3775 3
+CircuitBuildTimeBin 3825 2
+CircuitBuildTimeBin 3875 2
+CircuitBuildTimeBin 3925 11
+CircuitBuildTimeBin 3975 6
+CircuitBuildTimeBin 4025 3
+CircuitBuildTimeBin 4125 2
+CircuitBuildTimeBin 4175 2
+CircuitBuildTimeBin 4225 2
+CircuitBuildTimeBin 4675 1
+CircuitBuildTimeBin 4925 1
+CircuitBuildTimeBin 5125 1
+CircuitBuildTimeBin 5275 1
+CircuitBuildTimeBin 5675 1
+CircuitBuildTimeBin 5925 1
+CircuitBuildTimeBin 6625 1
+CircuitBuildTimeBin 6825 1
+CircuitBuildTimeBin 7075 1
+CircuitBuildTimeBin 8475 1
+CircuitBuildTimeBin 8775 1
+CircuitBuildTimeBin 9975 1
+CircuitBuildTimeBin 19425 1
+CircuitBuildTimeBin 19925 1
+CircuitBuildTimeBin 40425 1

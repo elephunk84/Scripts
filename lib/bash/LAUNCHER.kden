@@ -1,0 +1,43 @@
+#!/bin/bash
+
+choice=$(zenity --list --text "Chromium Browser" --height=200 --width=300 --radiolist --column "Pick" --column "Site" \
+TRUE "Run KDenLive" \
+FALSE "Open Project" \
+)
+
+export $(dbus-launch)
+
+case $choice in
+    "Run KDenLive")
+        kdenlive
+        ;;
+    "Open Project")
+	choice=$(zenity --list --text "Chromium Browser" --height=600 --width=300 --radiolist --column "Pick" --column "Site" \
+	TRUE "Anal" \
+	FALSE "Teen" \
+	FALSE "MyVids" \
+	FALSE "Machines" \
+	FALSE "Redhead" \
+	)
+	case $choice in
+    		"Anal")
+        		project="Anal"
+        		;;
+    		"Teen")
+        		project="Teen"
+        		;;
+    		"Redhead")
+        		project="RedHead"
+        		;;
+                "MyVids")
+        		project="MyVids"
+        		;;
+                "Machines")
+        		project="Machines"
+        		;;
+
+		esac
+       		kdenlive /home/iainstott/kdenlive/${project}.kdenlive
+        	;;
+esac
+

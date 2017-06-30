@@ -1,0 +1,148 @@
+#!/bin/bash
+
+cd /home/iainstott/GitRepo/Scripts
+
+kodiHOME='/home/iainstott/.kodi/'
+kodiADDONS='/home/iainstott/.kodi/addons'
+kodiLOCAL='/home/iainstott/Kodi/'
+kodiBUILDARCHIVE=${kodiLOCAL}"BuildArchive/"
+kodiLOCALCURRENT=${kodiBUILDARCHIVE}"currentBuild/"
+kodiREMOTE='/mnt/NFS/Backup/Iains/KodiRepo/'
+kodiREMOTEBUILDARCHIVE=${kodiREMOTE}"BuildArchive/"
+kodiREMOTECURRENT=${kodiBUILDARCHIVE}"currentBuild/"
+kodiRESET=${kodiLOCAL}"reset.tgz"
+kodiCURRENT=${kodiLOCAL}"current.zip"
+kodiArchive=${kodiLOCAL}"backupFolder/BuildArchive/"
+
+kodiADDONSLIST=('repository.elephunk84' 'plugin.program.iainstool')
+
+function KODI_UpdateGITREPO {
+    echo "Updating Kodi/Git Repository...."
+    cd /home/iainstott/Kodi/Addons
+    python3 ./generator.py
+    git add .
+    git commit -m "Auto Update"
+    git push -u origin master
+}
+
+function KODI_removeLinks {
+    echo "Removing Links...."
+    cd ${kodiADDONS}
+        for ADDON in ${kodiADDONSLIST[@]}; do
+            unlink ${ADDON}
+            mkdir ${ADDON}
+            cd ${ADDON}
+            rsync -azh ${kodiREMOTE}${ADDON} .
+            cd ${kodiADDONS}
+        done
+}
+
+function KODI_makeLinks {
+    echo "Making Links...."
+    cd ${kodiADDONS}
+    for ADDON in ${kodiADDONSLIST[@]}; do
+        rm -rf ${ADDON}
+        ln -s ${kodiREMOTE}${ADDON} ./
+    done
+}
+
+
+function KODI_Backup {
+    echo "Making Kodi Backup...."
+    date=$(date +%d-%m-%Y_%H:%M)
+    KODI_removeLinks
+    cd ${kodiHOME}
+    echo "Making Archive...."
+    zip -r --exclude="*.zip" ${kodiArchive}${date}.zip ./
+    cd /home/iainstott/GitRepo/Scripts
+    action=$(zenity  --list --title="Kodi Menu" --text "Build Actions?" --checklist  --column "Pick" --column "Type" FALSE "Create Current")
+        case $action in
+            "Create Current")
+                echo "Creating Current Build"
+                rm -rf ${kodiLOCAL}"current.zip"
+                rsync -aAXHPv --delete-during ${kodiHOME} ${kodiLOCALCURRENT}
+                cp ${kodiArchive}${date}.zip ${kodiCURRENT}
+                ;;
+        esac
+    echo "Sync to Remote...."
+    rsync -aAXHPv --delete-during ${kodiLOCAL} ${kodiREMOTE}
+    KODI_makeLinks
+    echo "Backup complete, press any key to close...."
+    read
+}
+
+function KODI_SyncREMOTE {
+    action=$(zenity  --list --title="Kodi Menu" --text "Direction?" --radiolist  --column "Pick" --column "Type" TRUE "Local to Remote" FALSE "Remote to Local")
+        case $action in
+            "Local to Remote")
+                source=${kodiLOCAL}
+                destination=${kodiREMOTE}
+                ;;
+            "Remote to Local")
+                source=${kodiREMOTE}
+                destination=${kodiLOCAL}
+                ;;
+        esac
+    xterm -e "rsync -aAXHPv --delete-during ${source} ${destination}"
+}
+
+function KODI_RestoreBUILD {
+    BACKUP=$(find /home/iainstott/Kodi/backupFolder/BuildArchive -mindepth 1 -maxdepth 1  -name "*.tgz" | sort | awk '{ printf "FALSE""\0"$0"\0" }' | xargs -0 zenity --list --height=400 --width=600 --title="Kodi Menu" --text="Choose a Backup to Restore" --radiolist --multiple --column ' ' --column 'Devices')
+    rm -rf ${kodiHOME}
+    mkdir ${kodiHOME}
+    cd ${kodiHOME}
+    tar -xzf ${BACKUP}
+}
+
+function KODI_Reset {
+    rm -rf ${kodiHOME}
+    mkdir ${kodiHOME}
+    cd ${kodiHOME}
+    tar -xzf ${kodiRESET}
+}
+
+function KODI_CreateReset {
+    cd ${kodiHOME}
+    tar -zcvf ${kodiRESET} *
+}
+
+function KODI_updateMediaCentre {
+    ips=('192.168.1.2' '192.168.0.130')
+    for ip in $ips; do
+        ssh osmc@${ip} "
+            cd ~/.kodi
+            rsync -avz --delete-during iainstott@192.168.1.1:/mnt/Backup/Iains/KodiRepo/currentBuild .
+            sudo pkill kodi.bin
+            "
+    done
+}
+
+function KODI_GUI {
+    action=$(zenity  --list --height=400 --width=400 --title="Kodi Menu" --text "Action To Run" --radiolist  --column "Pick" --column "Type" TRUE "Backup Build" FALSE "Update GIT Repo" FALSE "Install Current Build To Media Centres" FALSE "Sort IPTV List" FALSE "Restore Build" FALSE "Reset Build" FALSE "Create Reset Archive" FALSE "Sync Remote Folders")
+    case $action in
+        "Backup Build")
+            terminator -e 'source /home/iainstott/GitRepo/Scripts/lib/bash/kodiScripts; KODI_Backup'
+            ;;
+        "Install Current Build To Media Centres")
+            terminator -e 'source /home/iainstott/GitRepo/Scripts/lib/bash/kodiScripts; KODI_updateMediaCentre'
+            ;;
+        "Update GIT Repo")
+            terminator -e 'source /home/iainstott/GitRepo/Scripts/lib/bash/kodiScripts; KODI_UpdateGITREPO'
+            ;;
+        "Sort IPTV List")
+            terminator -e "ssh -Y iainstott@192.168.0.2 'source /home/iainstott/GitRepo/Scripts/lib/bash/kodiSORTIPTV; kodiSORTIPTV_GUI'"
+            ;;
+        "Restore Build")
+            KODI_RestoreBUILD
+            ;;
+        "Reset Build")
+            KODI_Reset
+            ;;
+        "Create Reset Archive")
+            KODI_CreateReset
+            ;;
+        "Sync Remote Folders")
+            terminator -e 'source /home/iainstott/GitRepo/Scripts/lib/bash/kodiScripts; KODI_SyncREMOTE'
+            ;;
+    esac
+}

@@ -1,0 +1,26 @@
+#!/bin/bash
+cd /mnt/Backup/GitRepo/sketchbook/My_Projects
+files=$(find . -type f -name '*.ino')
+hosts=(192.168.0.85 192.68.0.1) 
+
+unset filelist
+for file in $files; do
+    filelist+=("FALSE")
+    filelist+=("$file")
+done
+
+unset hostlist
+for host in $hosts; do
+    hostlist+=("FALSE")
+    hostlist+=("$host")
+done
+
+fileCHOICE=$(zenity --list --text "Show List" --height=600 --width=600 --checklist --column "Pick" --column "List" "${filelist[@]}" --separator=":")
+hostCHOICE=$(zenity --list --text "Show List" --checklist --column "Pick" --column "List" "${hostlist[@]}" --separator=" ")
+
+rsync -avzP $fileCHOICE iainstott@$hostCHOICE:/home/iainstott
+ssh iainstott@$hostCHOICE make && sudo make upload
+ssh iainstott@$hostCHOICE rm -rf /home/iainstott/*.ino
+sleep 10
+ssh iainstott@$hostCHOICE rm -rf /home/iainstott/build-mega2560
+cd

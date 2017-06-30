@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FreeFileSync XmlFormat="7" XmlType="BATCH">
+    <MainConfig>
+        <Comparison>
+            <Variant>TimeAndSize</Variant>
+            <Symlinks>Exclude</Symlinks>
+            <IgnoreTimeShift/>
+        </Comparison>
+        <SyncConfig>
+            <Variant>Update</Variant>
+            <CustomDirections>
+                <LeftOnly>left</LeftOnly>
+                <RightOnly>none</RightOnly>
+                <LeftNewer>right</LeftNewer>
+                <RightNewer>none</RightNewer>
+                <Different>right</Different>
+                <Conflict>none</Conflict>
+            </CustomDirections>
+            <DetectMovedFiles>false</DetectMovedFiles>
+            <DeletionPolicy>Permanent</DeletionPolicy>
+            <VersioningFolder Style="Replace"/>
+        </SyncConfig>
+        <GlobalFilter>
+            <Include>
+                <Item>*</Item>
+            </Include>
+            <Exclude>
+                <Item>/.Trash-*/</Item>
+                <Item>/.recycle/</Item>
+            </Exclude>
+            <TimeSpan Type="None">0</TimeSpan>
+            <SizeMin Unit="None">0</SizeMin>
+            <SizeMax Unit="None">0</SizeMax>
+        </GlobalFilter>
+        <FolderPairs>
+            <Pair>
+                <Left>/home/iainstott/Kodi</Left>
+                <Right>/mnt/NFS/Backup/Iains/KodiRepo</Right>
+            </Pair>
+        </FolderPairs>
+        <OnCompletion>Close progress dialog</OnCompletion>
+    </MainConfig>
+    <BatchConfig>
+        <HandleError>Popup</HandleError>
+        <RunMinimized>true</RunMinimized>
+        <LogfileFolder Limit="-1">/home/iainstott/GitRepo/Scripts/lib/gui/FileSync/logs</LogfileFolder>
+    </BatchConfig>
+</FreeFileSync>

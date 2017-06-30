@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FreeFileSync XmlFormat="7" XmlType="BATCH">
+    <MainConfig>
+        <Comparison>
+            <Variant>TimeAndSize</Variant>
+            <Symlinks>Exclude</Symlinks>
+            <IgnoreTimeShift/>
+        </Comparison>
+        <SyncConfig>
+            <Variant>Update</Variant>
+            <CustomDirections>
+                <LeftOnly>right</LeftOnly>
+                <RightOnly>left</RightOnly>
+                <LeftNewer>right</LeftNewer>
+                <RightNewer>left</RightNewer>
+                <Different>none</Different>
+                <Conflict>none</Conflict>
+            </CustomDirections>
+            <DetectMovedFiles>false</DetectMovedFiles>
+            <DeletionPolicy>Permanent</DeletionPolicy>
+            <VersioningFolder Style="Replace"/>
+        </SyncConfig>
+        <GlobalFilter>
+            <Include>
+                <Item>*</Item>
+            </Include>
+            <Exclude>
+                <Item>/.Trash-*/</Item>
+                <Item>/.recycle/</Item>
+                <Item>/.cache/</Item>
+                <Item>/.config/</Item>
+                <Item>/Kodi/backupFolder/</Item>
+                <Item>/remmina_devel/</Item>
+                <Item>/*.iso</Item>
+                <Item>/*.img</Item>
+                <Item/>
+            </Exclude>
+            <TimeSpan Type="None">0</TimeSpan>
+            <SizeMin Unit="None">0</SizeMin>
+            <SizeMax Unit="None">0</SizeMax>
+        </GlobalFilter>
+        <FolderPairs>
+            <Pair>
+                <Left>/home/iainstott/.kodi</Left>
+                <Right>/home/iainstott/Kodi/currentBuild</Right>
+            </Pair>
+        </FolderPairs>
+        <OnCompletion/>
+    </MainConfig>
+    <BatchConfig>
+        <HandleError>Popup</HandleError>
+        <RunMinimized>false</RunMinimized>
+        <LogfileFolder Limit="-1">/home/iainstott/GitRepo/Scripts/lib/gui/FileSync/logs</LogfileFolder>
+    </BatchConfig>
+</FreeFileSync>
