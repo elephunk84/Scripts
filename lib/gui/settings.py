@@ -13,6 +13,7 @@ lib_path = os.path.abspath(os.path.join(workingdir, 'lib'))
 sys.path.append(lib_path)
 
 dbdir='/mnt/NFS/Backup/GitRepo/Scripts/lib/gui/data/logger'
+commandFILE=workingdir+'/lib/data/commandhistory.txt'
 
 DOCUMENTS={
         'fstab':['/etc/fstab',['local', 'remote']],

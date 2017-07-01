@@ -10,6 +10,7 @@ discDIRContents=os.listdir(discsDIR)
 discDIRContents=sorted(discDIRContents, reverse=True)
 
 import tkinter as Tk
+from PIL import ImageTk, Image
 
 drives=subprocess.Popen(['ls /dev/disk/by-id/usb-*'], shell=True, stdout=subprocess.PIPE)
 drives_stdout, drives_stderr = drives.communicate()
@@ -43,9 +44,9 @@ class ISOTOOLS(Tk.Frame):
         self.Page1_text.set("None")
         self.Page1_label=Tk.Label(self.frame, text="Please choose a mode").pack(pady=10)
         for choice, command in CHOICE1.items():
-            Page1_radio=Tk.Radiobutton(self.frame, variable=self.Page1_text, text=choice, value=command).pack()
-        Page1_b1 = Tk.Button(self.frame, text="Next",  command=lambda : self.onClick(), justify=Tk.LEFT)
-        Page1_b1.pack(pady=30)
+            self.Page1_radio=Tk.Radiobutton(self.frame, variable=self.Page1_text, text=choice, value=command, justify=Tk.RIGHT).pack(anchor='w')
+        #self.Page1_radio.place(x=10, y=10)
+        Page1_b1 = Tk.Button(self.frame, text="Next",  command=lambda : self.onClick(), justify=Tk.LEFT).pack(pady=10, anchor='e')
 
     def listener(self, arg1, arg2=None):
         """pubsub listener - opens main frame when otherFrame closes"""

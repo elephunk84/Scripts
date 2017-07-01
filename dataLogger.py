@@ -5,9 +5,6 @@ import os, os.path, sys, subprocess, socket, sqlite3, threading, re
 import math, glob
 import datetime, time
 
-from lib.gui.hosts import *
-from lib.gui.diskinfo import *
-
 hostname=socket.gethostname()
 if hostname in IainsLaptop:
     workingdir="/mnt/NFS/Backup/GitRepo/Scripts"
@@ -25,6 +22,9 @@ if hostname in TheBeastServer:
 
 lib_path = os.path.abspath(os.path.join(workingdir, 'lib'))
 sys.path.append(lib_path)
+
+from lib.gui.hosts import *
+from lib.gui.diskinfo import *
 
 guiFOLDER=workingdir+"/lib/gui"
 guidataFOLDER=guiFOLDER+"/data"

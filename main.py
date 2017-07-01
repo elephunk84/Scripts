@@ -152,7 +152,8 @@ class UI(Tk.Frame):
         sshMenu.add_command(label="Manual Connection", underline=0, command='')
         sshMenu.add_separator()
         sshMenu.add_command(label="SSH Copy ID", underline=0, command='')
-        sshMenu.add_command(label="Veiw Keys", underline=0, command='')
+        sshMenu.add_command(label="Veiw SHS Key", underline=0, command=lambda:self.GUIShowSSHKey())
+        sshMenu.add_command(label="Veiw GPG Key", underline=0, command=lambda:self.GUIShowGPGKey())
         sshMenu.add_command(label="Generate New Keys", underline=0, command='')
         bookmarksMenu = Tk.Menu(menubar)
         bookmarksMenu.add_command(label="BeastServer Proxmox", underline=0, command=lambda : self.openCHROME("https://192.168.0.2:8006/#v1:0:18:4::::::"))
@@ -265,7 +266,7 @@ class UI(Tk.Frame):
         self.p1_b10 =Tk.Button(self.p1_f1, text="Yaourt-GUI", command=lambda:self.runCMD(prog_yaourtgui, "True"), justify=LEFT, width=10)
         self.p1_b10.pack()
         self.p1_b10.place(x=550, y=125)
-        self.p1_b11 =Tk.Button(self.p1_f1, text="Virt-Manager", command=lambda:subprocess.call(("python "+workingdir+"/lib/gui/private.py"), shell=True), justify=LEFT, width=10)
+        self.p1_b11 =Tk.Button(self.p1_f1, text="Virt-Manager", command=lambda:self.GUIPrivateMenu(), justify=LEFT, width=10)
         self.p1_b11.pack()
         self.p1_b11.place(x=660, y=5)
         self.p1_b12 =Tk.Button(self.p1_f1, text="Tor", command=lambda:subprocess.call(("tor-browser-en"), shell=False), justify=LEFT, width=10)
@@ -689,7 +690,7 @@ class UI(Tk.Frame):
         self.p7_b32 =Tk.Button(self.p7_2_f1, text="Sync Remote to Local", command=lambda : self.runCMD("rsync -avzP --exclude 'backupFolder' /mnt/NFS/Backup/Iains/KodiRepo/ /home/iainstott/Kodi/", 'True'), justify=LEFT, width=20)
         self.p7_b32.pack()
         self.p7_b32.place(x=490, y=35)
-        self.p7_b33 =Tk.Button(self.p7_2_f1, text="Update Online Git", command=lambda : self.kodi_GUIGenAddons(), justify=LEFT, width=20)
+        self.p7_b33 =Tk.Button(self.p7_2_f1, text="Update Addon Repo", command=lambda : self.kodi_GUIGenAddons(), justify=LEFT, width=20)
         self.p7_b33.pack()
         self.p7_b33.place(x=490, y=65)
         self.p7_2_f2=ttk.LabelFrame(self.p7_2, text="IPTV Info", width=785, height=225)
@@ -725,7 +726,7 @@ class UI(Tk.Frame):
             self.OrigOptions=['Pacman', 'sudo pacman -S ', 'Yaourt', 'yaourt -S ']
             self.ArchInstOption=Tk.StringVar()
             self.ArchInstOption.set(self.OrigOptions[0])
-            self.installPrgArch_toplevel = Toplevel()
+            self.installPrgArch_toplevel = Tk.Toplevel()
             self.installPrgArch_toplevel.title("Arch Choice")
             self.installPrgArch_toplevel.geometry('200x100+300+300')
             self.archInstallOption=Tk.OptionMenu(self.installPrgArch_toplevel, self.ArchInstOption, self.OrigOptions[0], self.OrigOptions[2])
@@ -769,30 +770,39 @@ class UI(Tk.Frame):
     def onExit(self):
         self.quit()
 
-    def EDIT_File(self, editor, filename):
+    def writeCOMMAND(command):
+        with open(commandFILE, 'a') as commandfile:
+            commandfile.write(command)
+
+    def editFILE(self, editor, filename):
         os.popen(editor+filename)
 
     def runPYTHON2(self, filename, module):
         command="konsole -e python2 -c 'import "+filename+"; "+module
+        writeCOMMAND(command)
         os.popen(command)
 
     def runPYTHON3(self, filename, module):
         command="konsole -e python3 -c 'from "+filename+" import *; "+module+"'"
-        print(command)
+        writeCOMMAND(command)
         os.popen(command)
 
-    def runCMD(self, cmd, shellVAR):
-        subprocess.call(("konsole -e "+cmd), shell=shellVAR)
+    def runCMD(self, command, shellVAR):
+        writeCOMMAND(command)
+        subprocess.call(("konsole -e "+command), shell=shellVAR)
 
-    def runPROG(self, cmd):
-        os.popen(cmd)
+    def runPROG(self, command):
+        writeCOMMAND(command)
+        os.popen(command)
 
     def kodi_GUIGenAddons(self):
         os.chdir(kodiGitREPO)
         self.KodiGUIWindow=Tk.Toplevel(self.parent)
         self.app=Kodi_GEN_ADDONS(self.KodiGUIWindow)
-        self.KodiGUIWindow.geometry('400x200+400+300')
+        self.KodiGUIWindow.geometry('400x200+500+300')
         self.KodiGUIWindow.title('Kodi Tools - Generate Addons')
+        self.img = Tk.PhotoImage(file = '/home/iainstott/GitRepo/Scripts/lib/gui/data/images/kodiicon.png')
+        self.KodiGUIWindow.tk.call('wm', 'iconphoto', self.KodiGUIWindow._w, self.img)
 
     def kodi_GUIGenBuild(self):
         os.chdir(kodiGitREPO)
@@ -800,19 +810,48 @@ class UI(Tk.Frame):
         self.app=Kodi_GEN_BUILD(self.KodiGUIWindow)
         self.KodiGUIWindow.geometry('800x400+300+200')
         self.KodiGUIWindow.title('Kodi Tools - Generate Build')
+        self.img = Tk.PhotoImage(file = '/home/iainstott/GitRepo/Scripts/lib/gui/data/images/kodiicon.png')
+        self.KodiGUIWindow.tk.call('wm', 'iconphoto', self.KodiGUIWindow._w, self.img)
 
     def GUIStringEncode(self):
         self.StringEncodeWINDOW=Tk.Toplevel(self.parent)
         self.app=STRINGENCODE(self.StringEncodeWINDOW)
-        self.StringEncodeWINDOW.title('Encode & Decode')
         self.StringEncodeWINDOW.geometry('600x200+400+200')
+        self.StringEncodeWINDOW.title('Advanced Tools - String Encode & Decode')
+        self.img = Tk.PhotoImage(file = '/home/iainstott/GitRepo/Scripts/lib/gui/data/images/encodeicon.png')
+        self.StringEncodeWINDOW.tk.call('wm', 'iconphoto', self.StringEncodeWINDOW._w, self.img)
 
     def GUIIsoTools(self):
         self.IsoToolsWINDOW=Tk.Toplevel(self.parent)
         self.app=ISOTOOLS(self.IsoToolsWINDOW)
         self.IsoToolsWINDOW.geometry('400x200+400+300')
-        self.IsoToolsWINDOW.title('Iso Tools')
+        self.IsoToolsWINDOW.title('System Tools - ISO Utilities')
+        self.img = Tk.PhotoImage(file = '/home/iainstott/GitRepo/Scripts/lib/gui/data/images/isoicon.png')
+        self.IsoToolsWINDOW.tk.call('wm', 'iconphoto', self.IsoToolsWINDOW._w, self.img)
 
+    def GUIPrivateMenu(self):
+        self.PrivateWINDOW=Tk.Toplevel(self.parent)
+        self.app=PRIVATE(self.PrivateWINDOW)
+        self.PrivateWINDOW.geometry('400x200+400+300')
+        self.PrivateWINDOW.title('Advanced Tools - Private Menu')
+        self.img = Tk.PhotoImage(file = '/home/iainstott/GitRepo/Scripts/lib/gui/data/images/privateicon.png')
+        self.PrivateWINDOW.tk.call('wm', 'iconphoto', self.PrivateWINDOW._w, self.img)
+
+    def GUIShowSSHKey(self):
+        self.PopupWINDOW=Tk.Toplevel(self.parent)
+        self.app=SSHKEY(self.PopupWINDOW)
+        self.PopupWINDOW.geometry('400x200+400+300')
+        self.PopupWINDOW.title('SSH Tools - SSH Key')
+        self.img = Tk.PhotoImage(file = '/home/iainstott/GitRepo/Scripts/lib/gui/data/images/privateicon.png')
+        self.PopupWINDOW.tk.call('wm', 'iconphoto', self.PopupWINDOW._w, self.img)
+
+    def GUIShowGPGKey(self):
+        self.PopupWINDOW=Tk.Toplevel(self.parent)
+        self.app=GPGKEY(self.PopupWINDOW)
+        self.PopupWINDOW.geometry('400x200+400+300')
+        self.PopupWINDOW.title('SSH Tools - GPG Key')
+        self.img = Tk.PhotoImage(file = '/home/iainstott/GitRepo/Scripts/lib/gui/data/images/privateicon.png')
+        self.PopupWINDOW.tk.call('wm', 'iconphoto', self.PopupWINDOW._w, self.img)
 
 def main():
     root = Tk.Tk()

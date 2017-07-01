@@ -18,16 +18,6 @@ def get_diskInfo(filesystem):
     total, used, free, percent = disk_usage(filesystem)
     return str(filesystem+" = ("+total+" Total) ("+used+" Used) ("+free+" Free) "+percent+"% Used")
 
-def clickAbout():
-    clickabout_toplevel = Toplevel()
-    clickabout_toplevel.geometry('200x100+300+300')
-    label0 = Label(clickabout_toplevel, text="         ", height=0, width=100)
-    label0.pack()
-    label1 = Label(clickabout_toplevel, text="Ballsack", height=0, width=100)
-    label1.pack()
-    label2 = Label(clickabout_toplevel, text="Is Hairy", height=0, width=100)
-    label2.pack()
-
 def heatingGraphPage():
     heatingdb="/mnt/NFS/Backup/GitRepo/Heating/app/database/templogs/"+dateTimeLIST[7]+"/"+dateTimeLIST[6]+"/"+dateTimeLIST[5]+".db"
     with sqlite3.connect(heatingdb) as tempconn:

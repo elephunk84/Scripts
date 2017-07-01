@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os, sys, subprocess, sqlite3, datetime, time, glob, fileinput, re, string
+import os, sys, subprocess, sqlite3, datetime, time, glob, fileinput, re, string, filecmp
 import tkinter as Tk
 from tkinter import ttk
 
@@ -16,13 +16,12 @@ kodiBuildDate=''
 kodiBuildVer=''
 kodiLocalBuildVer=''
 kodiBuildNotes=''
+kodiBuildDescription=''
 dateTimeLIST=[]
 dbData=[]
 dbData2=[]
 Channels=[]
 NotFOUND=[]
-
-
 
 file_IPTVChannelList='/mnt/NFS/Backup/Iains/KodiRepo/IPTVLists/Channel_LIST.txt'
 file_IPTVChannelsAvailable='/mnt/NFS/Backup/Iains/KodiRepo/IPTVLists/Channels.txt'
@@ -37,6 +36,7 @@ kodiARCHIVEDIR=kodiREPODIR+'Archive/'
 kodiADDONSARCHIVEDIR=kodiREPODIR+'Addons/'
 kodiBUILDARCHIVEDIR=kodiARCHIVEDIR+'BuildArchive/'
 kodiCURRENTBUILDDIR=kodiARCHIVEDIR+'currentBuild/'
+kodiCURRENTBUILDADDONS=kodiCURRENTBUILDDIR+'addons/'
 
 kodiCurrentZIP=kodiREPODIR+'current.zip'
 kodiResetZIP=kodiREPODIR+'reset.zip'
@@ -82,22 +82,30 @@ else:
     def u(x):
         return x
 
+def same_folders(dcmp):
+    if dcmp.diff_files:
+        return False
+    for sub_dcmp in dcmp.subdirs.values():
+        return same_folders(sub_dcmp)
+    return True
+
 def kodiDBinit():
-    global kodiBuildVer, kodiBuildDate, kodiBuildNotes, kodiLocalBuildVer, kodiPackagesDIR2
+    global kodiBuildVer, kodiBuildDate, kodiBuildNotes, kodiLocalBuildVer, kodiOldBuildADDONS, kodiBuildDescription
     KodiNow=datetime.datetime.now()
     kodiBuildDate=KodiNow.strftime("%d/%B/%Y")
     kodiBuildVer='0.0.1'
     kodiLocalBuildVer='0.0.2'
-    kodiBuildNotes='Database Initialization....'
+    kodiBuildDescription='Database Initialization....'
+    kodiBuildNotes='First Run For System. Automatic Database Initialization'
     subprocess.call(['touch', kodiDB])
     with sqlite3.connect(kodiDB) as kodiconn:
         curs=kodiconn.cursor()
-        kodiTableCheck='create table if not exists ' + kodiTABLES[0] + '(BuildDate text, BuildVer text, LocalBuildVer text, InstalledADDONS text, BuildNotes text);'
+        kodiTableCheck='create table if not exists ' + kodiTABLES[0] + '(BuildDate text, BuildVer text, LocalBuildVer text, InstalledADDONS text, BuildDesctiption text, BuildNotes text);'
         curs.execute(kodiTableCheck)
     kodiDBLogBuild()
 
 def kodiDBGetData():
-    global kodiBuildVer, kodiBuildDate, kodiBuildNotes, kodiLocalBuildVer, kodiOldBuildADDONS
+    global kodiBuildVer, kodiBuildDate, kodiBuildNotes, kodiLocalBuildVer, kodiOldBuildADDONS, kodiBuildDescription
     with sqlite3.connect(kodiDB) as kodiconn:
         curs=kodiconn.cursor()
         curs.execute('SELECT * FROM '+kodiTABLES[0]+' ORDER BY ROWID DESC LIMIT 1')
@@ -106,13 +114,14 @@ def kodiDBGetData():
         kodiBuildVer=kodiDBData[1]
         kodiLocalBuildVer=kodiDBData[2]
         kodiOldBuildADDONS=kodiDBData[3]
-        kodiBuildNotes=kodiDBData[4]
+        kodiBuildDescription=kodiDBData[4]
+        kodiBuildNotes=kodiDBData[5]
 
 def kodiDBLogBuild():
-    global kodiBuildVer, kodiBuildDate, kodiBuildNotes, kodiLocalBuildVer, kodiPackagesDIR2
+    global kodiBuildVer, kodiBuildDate, kodiBuildNotes, kodiLocalBuildVer, kodiPackagesDIR2, kodiBuildDescription
     with sqlite3.connect(kodiDB) as kodiconn:
         curs=kodiconn.cursor()
-        curs.execute("INSERT INTO " + kodiTABLES[0] + " values (?, ?, ?, ?, ?);",  (kodiBuildDate, kodiBuildVer, kodiLocalBuildVer, str(kodiPackagesDIR2), kodiBuildNotes))
+        curs.execute("INSERT INTO " + kodiTABLES[0] + " values (?, ?, ?, ?, ?, ?);",  (kodiBuildDate, kodiBuildVer, kodiLocalBuildVer, str(kodiPackagesDIR2), kodiBuildDescription, kodiBuildNotes))
 
 
 for item in kodiPackagesDIR:
@@ -459,13 +468,23 @@ class Kodi_GEN_BUILD(Tk.Toplevel):
         for addon in kodiPackagesDIR2:
             if addon not in self.previousADDONS:
                 self.recentlyINSTALLED.append(addon)
+            dir1=kodiADDONSDIR+addon
+            dir2=kodiCURRENTBUILDADDONS+addon+'/'
+            print(dir1)
+            print(dir2)
+            try:
+                result=same_folders(filecmp.dircmp(dir1, dir2))
+            except:
+                pass
+            if result == False:
+                self.recentlyINSTALLED.append(addon)
         for addon in self.previousADDONS:
             if addon not in kodiPackagesDIR2:
                 self.recentlyREMOVED.append(addon)
         self.root=parent
         self.root.title("Kodi Build Details...")
         self.PanedWindow=ttk.Panedwindow(self.root, orient=Tk.VERTICAL)
-        self.BuildINFOLabelFrame=Tk.LabelFrame(self.PanedWindow, text="Build Info...", width=480, height=150)
+        self.BuildINFOLabelFrame=Tk.LabelFrame(self.PanedWindow, text="Build Info...", width=780, height=200)
         self.BuildVerLabel=Tk.Label(self.BuildINFOLabelFrame, text="Current Build Version = ", width=20)
         self.BuildVerLabel.pack()
         self.BuildVerLabel.place(x=5, y=5)
@@ -474,6 +493,7 @@ class Kodi_GEN_BUILD(Tk.Toplevel):
         self.BuildVerENTRY=Tk.Entry(self.BuildINFOLabelFrame, textvariable=self.BuildVerStringVar, width=10)
         self.BuildVerENTRY.pack()
         self.BuildVerENTRY.place(x=170, y=5)
+
         self.NextBuildVerLabel=Tk.Label(self.BuildINFOLabelFrame, text="Next Build Version = ", width=20)
         self.NextBuildVerLabel.pack()
         self.NextBuildVerLabel.place(x=5, y=35)
@@ -482,6 +502,41 @@ class Kodi_GEN_BUILD(Tk.Toplevel):
         self.NextBuildVerENTRY=Tk.Entry(self.BuildINFOLabelFrame, textvariable=self.NextBuildVerStringVar, width=10)
         self.NextBuildVerENTRY.pack()
         self.NextBuildVerENTRY.place(x=170, y=35)
+
+        self.NextBuildDescLabel=Tk.Label(self.BuildINFOLabelFrame, text="Build Description", width=20)
+        self.NextBuildDescLabel.pack()
+        self.NextBuildDescLabel.place(x=0, y=75)
+        self.NextBuildDescStringVar=Tk.StringVar()
+        self.NextBuildDescStringVar.set(kodiBuildDescription)
+        self.NextBuildDescENTRY=Tk.Entry(self.BuildINFOLabelFrame, textvariable=self.NextBuildDescStringVar, width=36, justify=Tk.LEFT)
+        self.NextBuildDescENTRY.pack()
+        self.NextBuildDescENTRY.place(x=5, y=95)
+
+        self.NextBuildNotesLabel=Tk.Label(self.BuildINFOLabelFrame, text="Build Notes", width=20, justify=Tk.LEFT)
+        self.NextBuildNotesLabel.pack()
+        self.NextBuildNotesLabel.place(x=0, y=125)
+        self.NextBuildNotesStringVar=Tk.StringVar()
+        self.NextBuildNotesStringVar.set(kodiBuildNotes)
+        self.NextBuildNotesENTRY=Tk.Entry(self.BuildINFOLabelFrame, textvariable=self.NextBuildNotesStringVar, width=36)
+        self.NextBuildNotesENTRY.pack(ipady=3)
+        self.NextBuildNotesENTRY.place(x=5, y=145)
+
+        self.RecentlyInstalled=Tk.Label(self.BuildINFOLabelFrame, text='Recently Installed or Updated')
+        self.RecentlyInstalled.pack()
+        self.RecentlyInstalled.place(x=320, y=5)
+        self.RecentlyInstalledADDONS=Tk.Listbox(self.BuildINFOLabelFrame, height=8, width=27)
+        for package in self.recentlyINSTALLED:
+            self.RecentlyInstalledADDONS.insert(0, package)
+        self.RecentlyInstalledADDONS.pack()
+        self.RecentlyInstalledADDONS.place(x=320, y=25)
+        self.RecentlyRemoved=Tk.Label(self.BuildINFOLabelFrame, text='Recently Removed')
+        self.RecentlyRemoved.pack()
+        self.RecentlyRemoved.place(x=545, y=5)
+        self.RecentlyRemovedADDONS=Tk.Listbox(self.BuildINFOLabelFrame, height=8, width=27)
+        for package in self.recentlyREMOVED:
+            self.RecentlyRemovedADDONS.insert(0, package)
+        self.RecentlyRemovedADDONS.pack()
+        self.RecentlyRemovedADDONS.place(x=545, y=25)
         self.PanedWindow.add(self.BuildINFOLabelFrame)
         self.PanedWindow.place(x=5, y=5)
         self.button=Tk.Button(self.root, text="Create", command=lambda:self.OnClick())
