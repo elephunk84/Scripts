@@ -1,0 +1,8 @@
+Thumbnails/*
+thumbnails/*
+temp/*
+media/*
+userdata/addon_data/script.areswizard/backup/*
+userdata/addon_data/pvr.iptvsimple/custom.xml
+userdata/addon_data/pvr.iptvsimple/xmltv.xml.cache
+*.zip

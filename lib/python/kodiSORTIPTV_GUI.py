@@ -11,12 +11,14 @@ m3u2FILE=("IPTVLists/Archive/"+str(date)+"_2.m3u")
 M3UFILES=[m3u1FILE, m3u2FILE]
 m3uFILE="IPTVLists/IPTV.m3u"
 mym3uFILE="IPTVLists/MYIPTV.m3u"
+sportsM3U="IPTVLists/Sports.m3u"
 channellist="IPTVLists/Channel_LIST.txt"
+sportsfile="IPTVLists/Channels_SPORTS.txt"
 fileHEADER="#EXTM3U"
 lineSTART="#EXTINF:-1,"
-webgrabCONFIG="WebGrab/WebGrab++.config.xml"
-webgrabSTART="WebGrab/config.start"
-webgrabEND="WebGrab/config.end"
+webgrabCONFIG="IPTVLists/WebGrab/WebGrab++.config.xml"
+webgrabSTART="IPTVLists/WebGrab/config.start"
+webgrabEND="IPTVLists/WebGrab/config.end"
 catlist=["RAD", "UK ", "USA", "VIP", "18+", "24/7"]
 skiplist=["AR", "AU", "CA", "DE", "ES", "IN", "NL", "PK", "PL", "PT", "VOD"]
 
@@ -24,6 +26,8 @@ skiplist=["AR", "AU", "CA", "DE", "ES", "IN", "NL", "PK", "PL", "PT", "VOD"]
 mychannelsDICT={}
 mychannelsDICTMASTER={}
 availchannelsDICT={}
+sportsLIST=[]
+allchannelsDICT={}
 
 def renumberCHANNELS ():
     number=1
@@ -100,6 +104,7 @@ def buildDICTIONARIES ():
                         availchannelsDICT[chname]=m3ulink
                     else:
                         pass
+                    allchannelsDICT[name]=m3ulink
                 except IndexError:
                     pass
     with open('IPTVLists/Channels.txt', 'r') as channellistsorting:
@@ -108,6 +113,11 @@ def buildDICTIONARIES ():
     with open('IPTVLists/Channels.txt', 'w') as channellistsorted:
         for line in lines:
             channellistsorted.write(line)
+    with open('IPTVLists/Channels_SPORTS.txt', 'r') as sportslist:
+        lines=sportslist.readlines()
+        for line in lines:
+            line=line.rstrip('\n')
+            sportsLIST.append(line)
 
 def buildMasterDICT ():
     for key in mychannelsDICT.keys() & availchannelsDICT.keys():
@@ -127,7 +137,6 @@ def buildMasterDICT ():
         mychannelsDICTMASTER[channel]=data2
     with open('IPTVLists/NotFound.txt', 'w') as notfound:
         for channel, values in mychannelsDICT.items():
-            print(channel, values)
             if channel not in availchannelsDICT:
                 group=values[1]
                 notfound.write(group+' | '+channel+' \n')
@@ -138,29 +147,38 @@ def buildMasterDICT ():
         for line in lines:
             notfoundsorted.write(line)
 
+
 def buildM3UFILE ():
     with open(m3uFILE, 'w') as f:
         with open(mym3uFILE, 'w') as myf:
-            f.write(fileHEADER+'\n')
-            myf.write(fileHEADER+'\n')
-            channels=collections.OrderedDict(sorted(mychannelsDICTMASTER.items()))
-            for key, value in channels.items():
-                name=(value[0])
-                group=(value[1])
-                link=(value[2])
-                if name in ("ITV +1", "ITV 2 +1", "ITV 3 +1", "ITV 4 +1"):
-                    lineSTART="#EXTINF:-0,"
-                else:
-                    lineSTART="#EXTINF:-1,"
-                link2=link.replace("IainStott2/", "IainStott/")
-                if "18+" not in group:
+            with open(sportsM3U, 'w') as sf:
+                f.write(fileHEADER+'\n')
+                myf.write(fileHEADER+'\n')
+                sf.write(fileHEADER+'\n')
+                normchannels=collections.OrderedDict(sorted(availchannelsDICT.items()))
+                for key, value in normchannels.items():
+                    print(key)
+                    name=(value[0])
+                    group=(value[1])
+                    link=(value[2])
+                    if name in ("ITV +1", "ITV 2 +1", "ITV 3 +1", "ITV 4 +1"):
+                        lineSTART="#EXTINF:-0,"
+                    else:
+                        lineSTART="#EXTINF:-1,"
+                    link2=link.replace("IainStott2/", "IainStott/")
+                    if "18+" not in group:
                         f.write(lineSTART+str(group)+' | '+str(name)+'\n')
                         f.write(str(link2)+'\n')
                         myf.write(lineSTART+str(group)+' | '+str(name)+'\n')
                         myf.write(str(link)+'\n')
-                else:
-                    myf.write(lineSTART+str(group)+' | '+str(name)+'\n')
-                    myf.write(str(link)+'\n')
+                    else:
+                        myf.write(lineSTART+str(group)+' | '+str(name)+'\n')
+                        myf.write(str(link)+'\n')
+                channels2=collections.OrderedDict(sorted(allchannelsDICT.items()))
+                for key, value in channels2.items():
+                    if key in sportsLIST:
+                        sf.write(str(key)+'\n')
+                        sf.write(str(value)+'\n')
     f.close()
     myf.close()
 

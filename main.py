@@ -105,7 +105,7 @@ class UI(Tk.Frame):
         while True:
             try:
                 self.getVARS()
-            except RuntimeError:
+            except:
                 sys.exit(0)
 
     def __init__(self, parent, *args, **kwargs):
@@ -666,22 +666,22 @@ class UI(Tk.Frame):
         self.p7_b12 =Tk.Button(self.p7_2_f1, text="Edit TV Channels", command=lambda : os.popen(prog_Geany+" "+file_IPTVChannelList), justify=LEFT, width=20)
         self.p7_b12.pack()
         self.p7_b12.place(x=110, y=35)
-        self.p7_b13 =Tk.Button(self.p7_2_f1, text="Edit webGrab Config", command=lambda : heatinginput(), justify=LEFT, width=20)
+        self.p7_b13 =Tk.Button(self.p7_2_f1, text="Edit webGrab Config", command='', justify=LEFT, width=20)
         self.p7_b13.pack()
         self.p7_b13.place(x=110, y=65)
         self.p7_b21 =Tk.Button(self.p7_2_f1, text="Update Backup", command=lambda : self.runPYTHON3('lib.gui.koditools', 'kodi_CreateBACKUP()'), justify=LEFT, width=20)
         self.p7_b21.pack()
         self.p7_b21.place(x=300, y=5)
-        self.p7_b22 =Tk.Button(self.p7_2_f1, text="Create Build", command=lambda : self.kodi_GUIGenBuild(), justify=LEFT, width=20)
+        self.p7_b22 =Tk.Button(self.p7_2_f1, text="Update Addons", command=lambda:self.kodi_GUIGenAddons(), justify=LEFT, width=20)
         self.p7_b22.pack()
         self.p7_b22.place(x=300, y=35)
-        self.p7_b23 =Tk.Button(self.p7_2_f1, text="Revert To Backup", command=lambda : heatinginput(), justify=LEFT, width=20)
+        self.p7_b23 =Tk.Button(self.p7_2_f1, text="Create Build", command=lambda:self.kodi_GUIGenBuild(), justify=LEFT, width=20)
         self.p7_b23.pack()
         self.p7_b23.place(x=300, y=65)
-        self.p7_b24 =Tk.Button(self.p7_2_f1, text="Create Default", command=lambda : heatinginput(), justify=LEFT, width=20)
+        self.p7_b24 =Tk.Button(self.p7_2_f1, text="Create Reset", command='', justify=LEFT, width=20)
         self.p7_b24.pack()
         self.p7_b24.place(x=300, y=95)
-        self.p7_b25 =Tk.Button(self.p7_2_f1, text="Clear Current Build", command=lambda : subprocess.call('rm -rf /home/iainstott/Kodi/Archive/currentBuild/*', shell=True), justify=LEFT, width=20)
+        self.p7_b25 =Tk.Button(self.p7_2_f1, text="Revert to Backup", command='', justify=LEFT, width=20)
         self.p7_b25.pack()
         self.p7_b25.place(x=300, y=125)
         self.p7_b31 =Tk.Button(self.p7_2_f1, text="Sync Local to Remote", command=lambda : self.runPYTHON3('lib.gui.koditools', 'os.system(kodiRsync_Get_IPTVLists); os.system(kodiRsync_LocalToRemote)'), justify=LEFT, width=20)
@@ -690,26 +690,32 @@ class UI(Tk.Frame):
         self.p7_b32 =Tk.Button(self.p7_2_f1, text="Sync Remote to Local", command=lambda : self.runCMD("rsync -avzP --exclude 'backupFolder' /mnt/NFS/Backup/Iains/KodiRepo/ /home/iainstott/Kodi/", 'True'), justify=LEFT, width=20)
         self.p7_b32.pack()
         self.p7_b32.place(x=490, y=35)
-        self.p7_b33 =Tk.Button(self.p7_2_f1, text="Update Addon Repo", command=lambda : self.kodi_GUIGenAddons(), justify=LEFT, width=20)
+        self.p7_b33 =Tk.Button(self.p7_2_f1, text="CLEAR CURRENT BACKUP", command=lambda : subprocess.call('rm -rf /home/iainstott/Kodi/Archive/currentBackup/*', shell=True), justify=LEFT, width=20)
         self.p7_b33.pack()
         self.p7_b33.place(x=490, y=65)
+        self.p7_b33 =Tk.Button(self.p7_2_f1, text="CLEAR CURRENT BUILD", command=lambda : subprocess.call('rm -rf /home/iainstott/Kodi/Archive/currentBuild/*', shell=True), justify=LEFT, width=20)
+        self.p7_b33.pack()
+        self.p7_b33.place(x=490, y=95)
+        self.p7_b33 =Tk.Button(self.p7_2_f1, text="CLEAR .kodi DIR", command=lambda : subprocess.call('rm -rf /home/iainstott/.kodi/*', shell=True), justify=LEFT, width=20)
+        self.p7_b33.pack()
+        self.p7_b33.place(x=490, y=125)
         self.p7_2_f2=ttk.LabelFrame(self.p7_2, text="IPTV Info", width=785, height=225)
         self.IPTVNotFoundLabel=Tk.Label(self.p7_2_f2, text="TV Channels Not Found", font=h4, justify=CENTER, fg=text_fg, bg=GLOBALBGCOLOR)
         self.IPTVNotFoundLabel.pack()
         self.IPTVNotFoundLabel.place(x=10, y=15)
-        self.IPTVNOTFoundList=Tk.Listbox(self.p7_2_f2, height=10, width=47)
+        self.IPTVNOTFoundList=Tk.Listbox(self.p7_2_f2, height=10, width=32)
         for notfound in notFound:
             self.IPTVNOTFoundList.insert(0, notfound)
         self.IPTVNOTFoundList.pack()
-        self.IPTVNOTFoundList.place(x=10, y=35)
+        self.IPTVNOTFoundList.place(x=10, y=30)
         self.IPTVNotFoundLabel=Tk.Label(self.p7_2_f2, text="TV Channels Available", font=h4, justify=CENTER, fg=text_fg, bg=GLOBALBGCOLOR)
         self.IPTVNotFoundLabel.pack()
-        self.IPTVNotFoundLabel.place(x=394, y=15)
-        self.IPTVChannelList=Tk.Listbox(self.p7_2_f2, height=10, width=47)
+        self.IPTVNotFoundLabel.place(x=280, y=15)
+        self.IPTVChannelList=Tk.Listbox(self.p7_2_f2, height=10, width=32)
         for channel in channelsAvail:
             self.IPTVChannelList.insert(0, channel)
         self.IPTVChannelList.pack()
-        self.IPTVChannelList.place(x=394, y=35)
+        self.IPTVChannelList.place(x=280, y=30)
         self.p7_1.add(self.p7_1_f1)
         self.p7_1.add(self.p7_1_f2)
         self.p7_2.add(self.p7_2_f1)
@@ -770,7 +776,7 @@ class UI(Tk.Frame):
     def onExit(self):
         self.quit()
 
-    def writeCOMMAND(command):
+    def writeCOMMAND(self, command):
         with open(commandFILE, 'a') as commandfile:
             commandfile.write(command)
 
@@ -779,33 +785,37 @@ class UI(Tk.Frame):
 
     def runPYTHON2(self, filename, module):
         command="konsole -e python2 -c 'import "+filename+"; "+module
-        writeCOMMAND(command)
+        self.writeCOMMAND(command)
         os.popen(command)
 
     def runPYTHON3(self, filename, module):
         command="konsole -e python3 -c 'from "+filename+" import *; "+module+"'"
-        writeCOMMAND(command)
+        self.writeCOMMAND(command)
         os.popen(command)
 
     def runCMD(self, command, shellVAR):
-        writeCOMMAND(command)
+        self.writeCOMMAND(command)
         subprocess.call(("konsole -e "+command), shell=shellVAR)
 
     def runPROG(self, command):
-        writeCOMMAND(command)
+        self.writeCOMMAND(command)
         os.popen(command)
 
     def kodi_GUIGenAddons(self):
         os.chdir(kodiGitREPO)
         self.KodiGUIWindow=Tk.Toplevel(self.parent)
         self.app=Kodi_GEN_ADDONS(self.KodiGUIWindow)
-        self.KodiGUIWindow.geometry('400x200+500+300')
+        self.KodiGUIWindow.geometry('400x300+500+300')
         self.KodiGUIWindow.title('Kodi Tools - Generate Addons')
         self.img = Tk.PhotoImage(file = '/home/iainstott/GitRepo/Scripts/lib/gui/data/images/kodiicon.png')
         self.KodiGUIWindow.tk.call('wm', 'iconphoto', self.KodiGUIWindow._w, self.img)
 
     def kodi_GUIGenBuild(self):
-        os.chdir(kodiGitREPO)
+        os.system(kodiRsync_Backup_Addons)
+        os.chdir('/home/iainstott/.kodi/')
+        os.system('find . -name \*.zip -delete')
+        os.system(kodiRsync_Backup_Current)
+        os.system(kodiRsync_Build_Current)
         self.KodiGUIWindow=Tk.Toplevel(self.parent)
         self.app=Kodi_GEN_BUILD(self.KodiGUIWindow)
         self.KodiGUIWindow.geometry('800x400+300+200')
@@ -855,6 +865,8 @@ class UI(Tk.Frame):
 
 def main():
     root = Tk.Tk()
+    root.style = ttk.Style()
+    root.style.theme_use('clam')
     root.title("Iains Control Panel")
     root.geometry('800x628+300+100')
     img = Tk.PhotoImage(file = icon)

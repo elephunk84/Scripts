@@ -12,11 +12,12 @@ kodiREMOTE='/mnt/LOCAL/Backup/BackupFolder/Backup/Iains/KodiRepo/'
 kodiREMOTECURRENT=${kodiREMOTE}"currentBuild/"
 kodiRESET=${kodiLOCAL}"reset.tgz"
 kodiCURRENT=${kodiLOCAL}"current.tgz"
-kodiArchive=${kodiLOCAL}"backupFolder/BuildArchive/"
+kodiArchive=${kodiLOCAL}"Archive/BuildArchive/"
 IPTVM3U=${kodiLOCAL}"IPTVLists/IPTV.m3u"
 IPTVMYM3U=${kodiLOCAL}"IPTVLists/MYIPTV.m3u"
 IPTVfile=${kodiLOCAL}"IPTV.m3u"
 IPTVMYfile=${kodiLOCAL}"MYIPTV.m3u"
+IPTVSportsM3U=${kodiLOCAL}"IPTVLists/Sports.m3u"
 IPTVRadioFolder=${kodiLOCAL}"IPTVLists/Radio/"
 IPTVChannelList=${kodiLOCAL}"/IPTVLists/Channels.txt"
 IPTVAllChannels=${kodiLOCAL}"/IPTVLists/ALLChannels.txt"
@@ -31,7 +32,7 @@ five=( '5' 'five' )
 hd=( 'hd' '720' '1080p' '1080' )
 
 function kodiSORTIPTV_ProcessStart {
-    rsync -avP --delete-during --exclude=./backupFolder /mnt/LOCAL/Backup/BackupFolder/Backup/Iains/KodiRepo/ /home/iainstott/Kodi/
+    rsync -avP --delete-during --exclude=Archive/ /mnt/LOCAL/Backup/BackupFolder/Backup/Iains/KodiRepo/ /home/iainstott/Kodi/
     rm -rf ${kodiLOCAL}"IPTVLists/Archive/${DATE}_1.m3u"
     rm -rf ${kodiLOCAL}"IPTVLists/Archive/${DATE}_2.m3u"
     rm -rf ${IPTVChannelList}
@@ -40,6 +41,8 @@ function kodiSORTIPTV_ProcessStart {
     rm -rf ${IPTVMYM3U}
     rm -rf ${IPTVAllChannels}
     touch ${IPTVM3U}
+    rm -rf ${IPTVSportsM3U}
+    touch ${IPTVSportsM3U}
     touch ${IPTVMYM3U}
     touch ${IPTVRadioFolder}
     touch ${IPTVChannelList}
@@ -47,8 +50,8 @@ function kodiSORTIPTV_ProcessStart {
     n=1
     DATE=$(date +%d-%m-%y)
     wget -O ${kodiLOCAL}"IPTVLists/Archive/${DATE}_1.m3u" "http://uk-mega-iptv.is-found.org:25461/get.php?username=IainStott2&password=QAcEiPTJsK&type=m3u_plus&output=ts"
-    wget -O ${kodiLOCAL}"plugin.video.megaiptv.zip" "https://megaiptv.co/dl.php?type=d&id=1"
-    wget -O ${kodiLOCAL}"megaiptv.apk" "https://megaiptv.co/dl.php?type=d&id=5"
+    wget -O ${kodiLOCAL}"Archive/plugin.video.megaiptv.zip" "https://megaiptv.co/dl.php?type=d&id=1"
+    wget -O ${kodiLOCAL}"Archive/megaiptv.apk" "https://megaiptv.co/dl.php?type=d&id=5"
     }
 
 function kodiSORTIPTV_ProcessEnd {
@@ -57,7 +60,7 @@ function kodiSORTIPTV_ProcessEnd {
     cp ${IPTVMYM3U} ${kodiLOCAL}"MYIPTV.m3u"
     if [ ${updateGUIDE} == 'YES' ]
     then
-        /usr/bin/mono ${kodiLOCAL}"WebGrab/WebGrab+Plus.exe" ${kodiLOCAL}"WebGrab/"
+        /usr/bin/mono ${kodiLOCAL}"IPTVLists/WebGrab/WebGrab+Plus.exe" ${kodiLOCAL}"IPTVLists/WebGrab/"
         cp ${kodiLOCAL}"IPTVLists/guide.xml" ${kodiLOCAL}"guide.xml"
     fi
     rsync -azvP --delete-during /home/iainstott/Kodi/ /mnt/LOCAL/Backup/BackupFolder/Backup/Iains/KodiRepo/

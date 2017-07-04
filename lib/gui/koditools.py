@@ -10,13 +10,15 @@ dateTimeLIST=[]
 kodiDB="/home/iainstott/GitRepo/Scripts/lib/gui/data/kodi.db"
 kodiTABLES=['buildDATA']
 
-kodiIgnore=['temp', 'packages']
+kodiIgnore=['temp', 'packages', '.directory']
 
 kodiBuildDate=''
 kodiBuildVer=''
 kodiLocalBuildVer=''
 kodiBuildNotes=''
 kodiBuildDescription=''
+kodiUpdatedPackages=[]
+kodiRemovedPackages=[]
 dateTimeLIST=[]
 dbData=[]
 dbData2=[]
@@ -36,6 +38,7 @@ kodiARCHIVEDIR=kodiREPODIR+'Archive/'
 kodiADDONSARCHIVEDIR=kodiREPODIR+'Addons/'
 kodiBUILDARCHIVEDIR=kodiARCHIVEDIR+'BuildArchive/'
 kodiCURRENTBUILDDIR=kodiARCHIVEDIR+'currentBuild/'
+kodiCURRENTBACKUPDIR=kodiARCHIVEDIR+'currentBackup/'
 kodiCURRENTBUILDADDONS=kodiCURRENTBUILDDIR+'addons/'
 
 kodiCurrentZIP=kodiREPODIR+'current.zip'
@@ -43,13 +46,15 @@ kodiResetZIP=kodiREPODIR+'reset.zip'
 
 kodiREPOREMOTEDIR='/mnt/NFS/Backup/Iains/KodiRepo/'
 
-kodiADDONSLIST=['repository.elephunk84', 'plugin.program.iainstool', 'plugin.program.super.favourites', 'script.tvguide.fullscreen', 'plugin.video.megaiptv']
+kodiADDONSLIST=['repository.elephunk84', 'plugin.program.iainstool', 'plugin.program.super.favourites', 'script.tvguide.fullscreen', 'plugin.video.megaiptv', 'script.ftvguide', 'skin.eminence.2']
 
 kodi_GiRepo_SuperFavourites='https://github.com/spoyser/spoyser-repo.git'
 
 kodiRsync_Get_IPTVLists="rsync -avzP --delete-during "+kodiREPOREMOTEDIR+"IPTVLists/ "+kodiREPODIR+"IPTVLists/"
-kodiRsync_Build_Current="rsync -avzP --delete-during --exclude=Thumbnails/  --exclude=Temp/ --exclude='*.zip' --exclude=Media/ --exclude=userdata/addon_data/ "+kodiBUILDDIR+" "+kodiCURRENTBUILDDIR
-kodiRsync_LocalToRemote="rsync -aP --delete-during --exclude=IPTVLists/ --exclude=.git/ "+kodiREPODIR+" iainstott@192.168.0.2:/mnt/LOCAL/Backup/BackupFolder/Backup/Iains/KodiRepo/"
+kodiRsync_Build_Current="rsync -avzP --delete-during "+kodiCURRENTBACKUPDIR+" "+kodiCURRENTBUILDDIR
+kodiRsync_Backup_Current="rsync -avzP --delete-during --exclude-from '/home/iainstott/GitRepo/Scripts/lib/kodiBUILDExclude.txt' "+kodiBUILDDIR+" "+kodiCURRENTBACKUPDIR
+kodiRsync_LocalToRemoteBuildArchive="rsync -aP "+kodiREPODIR+"Archive/BuildArchive/ iainstott@192.168.0.2:/mnt/LOCAL/Backup/BackupFolder/Backup/Iains/KodiRepo/Archive/BuildArchive/"
+kodiRsync_LocalToRemote="rsync -aP --delete-during --exclude=IPTVLists/ --exclude=.git/ --exclude=Archive/BuildArchive "+kodiREPODIR+" iainstott@192.168.0.2:/mnt/LOCAL/Backup/BackupFolder/Backup/Iains/KodiRepo/"
 kodiRsync_RemoteToLocal="rsync -avzP --delete-during --exclude=Archive/BuildArchive "+kodiREPODIR+" "+kodiREPOREMOTEDIR
 kodiRsync_Backup_Addons="rsync -avzP "+kodiInstalledPACKAGES+" "+kodiADDONSARCHIVEDIR
 
@@ -90,7 +95,7 @@ def same_folders(dcmp):
     return True
 
 def kodiDBinit():
-    global kodiBuildVer, kodiBuildDate, kodiBuildNotes, kodiLocalBuildVer, kodiOldBuildADDONS, kodiBuildDescription
+    global kodiBuildVer, kodiBuildDate, kodiBuildNotes, kodiLocalBuildVer, kodiPackagesDIR2, kodiBuildDescription, kodiUpdatedPackages, kodiRemovedPackages
     KodiNow=datetime.datetime.now()
     kodiBuildDate=KodiNow.strftime("%d/%B/%Y")
     kodiBuildVer='0.0.1'
@@ -100,7 +105,7 @@ def kodiDBinit():
     subprocess.call(['touch', kodiDB])
     with sqlite3.connect(kodiDB) as kodiconn:
         curs=kodiconn.cursor()
-        kodiTableCheck='create table if not exists ' + kodiTABLES[0] + '(BuildDate text, BuildVer text, LocalBuildVer text, InstalledADDONS text, BuildDesctiption text, BuildNotes text);'
+        kodiTableCheck='create table if not exists ' + kodiTABLES[0] + '(BuildDate text, BuildVer text, LocalBuildVer text, InstalledADDONS text, UpdatedADDONS text, RemovedADDONS, BuildDesctiption text, BuildNotes text);'
         curs.execute(kodiTableCheck)
     kodiDBLogBuild()
 
@@ -114,15 +119,79 @@ def kodiDBGetData():
         kodiBuildVer=kodiDBData[1]
         kodiLocalBuildVer=kodiDBData[2]
         kodiOldBuildADDONS=kodiDBData[3]
-        kodiBuildDescription=kodiDBData[4]
-        kodiBuildNotes=kodiDBData[5]
+        kodiBuildDescription=kodiDBData[6]
+        kodiBuildNotes=kodiDBData[7]
 
 def kodiDBLogBuild():
-    global kodiBuildVer, kodiBuildDate, kodiBuildNotes, kodiLocalBuildVer, kodiPackagesDIR2, kodiBuildDescription
+    global kodiBuildVer, kodiBuildDate, kodiBuildNotes, kodiLocalBuildVer, kodiPackagesDIR2, kodiBuildDescription, kodiUpdatedPackages, kodiRemovedPackages
     with sqlite3.connect(kodiDB) as kodiconn:
         curs=kodiconn.cursor()
-        curs.execute("INSERT INTO " + kodiTABLES[0] + " values (?, ?, ?, ?, ?, ?);",  (kodiBuildDate, kodiBuildVer, kodiLocalBuildVer, str(kodiPackagesDIR2), kodiBuildDescription, kodiBuildNotes))
+        curs.execute("INSERT INTO " + kodiTABLES[0] + " values (?, ?, ?, ?, ?, ?, ?, ?);",  (kodiBuildDate, kodiBuildVer, kodiLocalBuildVer, str(kodiPackagesDIR2), str(kodiUpdatedPackages), str(kodiRemovedPackages), kodiBuildDescription, kodiBuildNotes))
 
+def kodi_GenBuildLog():
+    global kodiBuildVer, kodiBuildDate, kodiBuildNotes, kodiLocalBuildVer, kodiPackagesDIR2, kodiBuildDescription, kodiUpdatedPackages, kodiRemovedPackages
+    buildLOGTXT=(kodiREPODIR+'build.log')
+    with open(buildLOGTXT, 'r') as oldlog:
+        oldlines=oldlog.readlines()
+    with open(buildLOGTXT, 'w') as newlog:
+        newlog.write(kodiBuildVer+'\n')
+        newlog.write(kodiBuildDescription+'\n')
+        newlog.write(kodiBuildNotes+'\n')
+        newlog.write('#######################'+'\n')
+        newlog.write('Installed/Updated Packages:'+'\n')
+        for package in kodiUpdatedPackages:
+            newlog.write(package+'\n')
+        newlog.write(''+'\n')
+        newlog.write('#######################'+'\n')
+        newlog.write('Removed Packages:'+'\n')
+        for package in kodiRemovedPackages:
+            newlog.write(package+'\n')
+        newlog.write(''+'\n')
+        newlog.write('#######################'+'\n')
+        newlog.write(''+'\n')
+        newlog.write(''+'\n')
+        for line in oldlines:
+            newlog.write(line)
+
+def kodi_RemoveAddonLINKS():
+    pass
+
+def kodi_CreateAddonLINKS():
+    pass
+
+def kodi_GetAddonVER():
+    matches=[]
+    for addon in kodiADDONSLIST:
+        filename=open(addon+'/addon.xml').read()
+        if addon == kodiADDONSLIST[0]:
+            match=re.findall(r'name="Elephunk84 Repository" version=\"(.+?)\"', filename)
+        if addon == kodiADDONSLIST[1]:
+            match=re.findall(r'name="Iain\'s Update Tool" version=\"(.+?)\"', filename)
+        if addon == kodiADDONSLIST[2]:
+            match=re.findall(r'name="Super Favourites" version=\"(.+?)\"', filename)
+        if addon == kodiADDONSLIST[3]:
+            match=re.findall(r'name="TV Guide Fullscreen" version=\"(.+?)\"', filename)
+        if addon == kodiADDONSLIST[4]:
+            match=re.findall(r'name="Mega IPTV" version=\"(.+?)\"', filename)
+        if addon == kodiADDONSLIST[5]:
+            match=re.findall(r'name="FTV Guide" version=\"(.+?)\"', filename)
+        if addon == kodiADDONSLIST[6]:
+            match=re.findall(r'name="Eminence 2.0" version=\"(.+?)\"', filename)
+        if match:
+            matches.append(match)
+    return matches
+
+def dateTime():
+    global dateTimeLIST
+    dateTimeLIST.append(now.strftime("%A"))
+    dateTimeLIST.append(now.strftime("%d/%B/%Y"))
+    dateTimeLIST.append(str(now.strftime("%H:%M:%S")))
+    dateTimeLIST.append(str(now.strftime("%H:%M")))
+    dateTimeLIST.append(yesterday)
+    dateTimeLIST.append(now.strftime("%d"))
+    dateTimeLIST.append(now.strftime("%B"))
+    dateTimeLIST.append(now.strftime("%Y"))
+    return dateTimeLIST
 
 for item in kodiPackagesDIR:
     if item in kodiIgnore:
@@ -152,35 +221,6 @@ with open(file_IPTVChannelsNOTFOUND, 'r') as f:
         line=line.split('\n', 1)[0]
         NotFOUND.append(line)
 notFound=sorted(NotFOUND, reverse=True)
-
-def kodi_GetAddonVER():
-    matches=[]
-    for addon in kodiADDONSLIST:
-        filename=open(addon+'/addon.xml').read()
-        if addon == kodiADDONSLIST[0]:
-            match=re.findall(r'name="Elephunk84 Repository" version=\"(.+?)\"', filename)
-        if addon == kodiADDONSLIST[1]:
-            match=re.findall(r'name="Iain\'s Update Tool" version=\"(.+?)\"', filename)
-        if addon == kodiADDONSLIST[2]:
-            match=re.findall(r'name="Super Favourites" version=\"(.+?)\"', filename)
-        if addon == kodiADDONSLIST[3]:
-            match=re.findall(r'name="TV Guide Fullscreen" version=\"(.+?)\"', filename)
-        if addon == kodiADDONSLIST[4]:
-            match=re.findall(r'name="Mega IPTV" version=\"(.+?)\"', filename)
-        if match:
-            matches.append(match)
-    return matches
-
-def dateTime():
-    global dateTimeLIST
-    dateTimeLIST.append(now.strftime("%A"))
-    dateTimeLIST.append(now.strftime("%d/%B/%Y"))
-    dateTimeLIST.append(str(now.strftime("%H:%M:%S")))
-    dateTimeLIST.append(str(now.strftime("%H:%M")))
-    dateTimeLIST.append(yesterday)
-    dateTimeLIST.append(now.strftime("%d"))
-    dateTimeLIST.append(now.strftime("%B"))
-    dateTimeLIST.append(now.strftime("%Y"))
 
 class Generator:
     """
@@ -254,23 +294,11 @@ class Generator:
             # oops
             print("An error occurred saving %s file!\n%s" % ( file, e ))
 
-def kodi_RemoveAddonLINKS():
-    pass
-
-def kodi_CreateAddonLINKS():
-    pass
-
-def kodi_GUI_GenAddons():
-    os.chdir(kodiGitREPO)
-    top=Tk.Tk()
-    app=Kodi_GEN_ADDONS(top)
-    top.geometry('400x200+200+200')
-    top.mainloop()
-
 class Kodi_GEN_ADDONS(Tk.Toplevel):
     def __init__(self, parent):
         self.root=parent
-        self.RepoVERS, self.ToolVERS, self.SuperVERS, self.TVGuideVERS, self.IPTVVERS=kodi_GetAddonVER()
+        self.RepoVERS, self.ToolVERS, self.SuperVERS, self.TVGuideVERS, self.IPTVVERS, self.FTVGuideVERS, self.SkinEMINENCEVERS=kodi_GetAddonVER()
+        self.AddonVERS=kodi_GetAddonVER()
         self.dirLIST=glob.glob(kodiGitREPO+'*/')
         self.zipLIST=glob.glob(kodiGitREPO+'*.zip')
         self.RepoVerLabel=Tk.Label(self.root, text="Repo Version = ", width=20)
@@ -313,6 +341,23 @@ class Kodi_GEN_ADDONS(Tk.Toplevel):
         self.IPTVVerENTRY=Tk.Entry(self.root, textvariable=self.IPTVVerStringVar, width=10)
         self.IPTVVerENTRY.pack()
         self.IPTVVerENTRY.place(x=170, y=125)
+        self.FTVVerLabel=Tk.Label(self.root, text="FTV Guide Version = ", width=20)
+        self.FTVVerLabel.pack()
+        self.FTVVerLabel.place(x=5, y=155)
+        self.FTVVerStringVar=Tk.StringVar()
+        self.FTVVerStringVar.set(self.FTVGuideVERS[0])
+        self.FTVVerENTRY=Tk.Entry(self.root, textvariable=self.FTVVerStringVar, width=10)
+        self.FTVVerENTRY.pack()
+        self.FTVVerENTRY.place(x=170, y=155)
+        self.EminVerLabel=Tk.Label(self.root, text="Skin Version = ", width=20)
+        self.EminVerLabel.pack()
+        self.EminVerLabel.place(x=5, y=185)
+        self.EminVerStringVar=Tk.StringVar()
+        self.EminVerStringVar.set(self.SkinEMINENCEVERS[0])
+        self.EminVerENTRY=Tk.Entry(self.root, textvariable=self.EminVerStringVar, width=10)
+        self.EminVerENTRY.pack()
+        self.EminVerENTRY.place(x=170, y=185)
+
         self.button=Tk.Button(self.root, text="Create", command=lambda:self.OnClick())
         self.button.pack()
         self.button.place(x=320, y=160)
@@ -325,6 +370,8 @@ class Kodi_GEN_ADDONS(Tk.Toplevel):
         superfav_VER=self.SuperFavVerStringVar.get()
         tvguide_VER=self.TVGuideVerStringVar.get()
         megaiptv_VER=self.IPTVVerStringVar.get()
+        ftvguide_VER=self.FTVVerStringVar.get()
+        skin_VER=self.EminVerStringVar.get()
         if iainsrepo_VER.startswith("("):
             iainsrepo_VER=re.findall(r"'(.*?)'", iainsrepo_VER, re.DOTALL)
         if type(iainsrepo_VER) is list:
@@ -345,16 +392,28 @@ class Kodi_GEN_ADDONS(Tk.Toplevel):
             megaiptv_VER=re.findall(r"'(.*?)'", megaiptv_VER, re.DOTALL)
         if type(megaiptv_VER) is list:
             megaiptv_VER=megaiptv_VER[0]
+        if ftvguide_VER.startswith("("):
+            ftvguide_VER=re.findall(r"'(.*?)'", ftvguide_VER, re.DOTALL)
+        if type(ftvguide_VER) is list:
+            ftvguide_VER=ftvguide_VER[0]
+        if skin_VER.startswith("("):
+            skin_VER=re.findall(r"'(.*?)'", skin_VER, re.DOTALL)
+        if type(skin_VER) is list:
+            skin_VER=skin_VER[0]
         self.RepoVerStringVar.set(iainsrepo_VER)
         self.ToolVerStringVar.set(iainstool_VER)
         self.SuperFavVerStringVar.set(superfav_VER)
         self.TVGuideVerStringVar.set(tvguide_VER)
         self.IPTVVerStringVar.set(megaiptv_VER)
+        self.FTVVerStringVar.set(ftvguide_VER)
+        self.EminVerStringVar.set(ftvguide_VER)
         self.repover=self.RepoVerStringVar.get()
         self.toolver=self.ToolVerStringVar.get()
         self.superfavver=self.SuperFavVerStringVar.get()
         self.tvguidever=self.TVGuideVerStringVar.get()
         self.megaiptvver=self.IPTVVerStringVar.get()
+        self.ftvguidever=self.FTVVerStringVar.get()
+        self.skinver=self.EminVerStringVar.get()
         if self.repover.startswith("("):
             self.repover=re.findall(r"'(.*?)'", self.repover, re.DOTALL)
         if self.toolver.startswith("("):
@@ -365,6 +424,10 @@ class Kodi_GEN_ADDONS(Tk.Toplevel):
             self.tvguidever=re.findall(r"'(.*?)'", self.tvguidever, re.DOTALL)
         if self.megaiptvver.startswith("("):
             self.megaiptvver=re.findall(r"'(.*?)'", self.megaiptvver, re.DOTALL)
+        if self.ftvguidever.startswith("("):
+            self.ftvguidever=re.findall(r"'(.*?)'", self.ftvguidever, re.DOTALL)
+        if self.skinver.startswith("("):
+            self.skinver=re.findall(r"'(.*?)'", self.skinver, re.DOTALL)
         for item in self.dirLIST:
             name=item.rsplit('/',2)[1]
             if name == kodiADDONSLIST[0]:
@@ -442,24 +505,49 @@ class Kodi_GEN_ADDONS(Tk.Toplevel):
                 zipver=name+'-'+self.megaiptvver
                 os.system('zip -r -0 '+zipver+'.zip '+name+' -x "*.zip"')
                 os.system('cp '+zipver+'.zip '+item+'/'+zipver+'.zip')
+            if name == kodiADDONSLIST[5]:
+                if type(self.ftvguidever) is list:
+                    self.ftvguidever=self.ftvguidever[0]
+                if self.ftvguidever not in self.AddonVERS[5]:
+                    xml=open(name+'/addon.xml').read()
+                    texttofind=(r'name="FTV Guide" version=\"(.+?)\"')
+                    texttoreplace=self.ftvguidever
+                    matches=re.findall(texttofind, xml)
+                    for m in matches:
+                        xml=xml.replace( m , texttoreplace)
+                    with open(name+'/addon.xml', 'w') as f:
+                        f.write(xml)
+                zipver=name+'-'+self.ftvguidever
+                os.system('zip -r -0 '+zipver+'.zip '+name+' -x "*.zip"')
+                os.system('cp '+zipver+'.zip '+item+'/'+zipver+'.zip')
+            if name == kodiADDONSLIST[6]:
+                if type(self.skinver) is list:
+                    self.skinver=self.skinver[0]
+                if self.skinver not in self.AddonVERS[6]:
+                    xml=open(name+'/addon.xml').read()
+                    texttofind=(r'name="Eminence 2.0" version=\"(.+?)\"')
+                    texttoreplace=self.skinver
+                    matches=re.findall(texttofind, xml)
+                    for m in matches:
+                        xml=xml.replace( m , texttoreplace)
+                    with open(name+'/addon.xml', 'w') as f:
+                        f.write(xml)
+                zipver=name+'-'+self.skinver
+                os.system('zip -r -0 '+zipver+'.zip '+name+' -x "*.zip"')
+                os.system('cp '+zipver+'.zip '+item+'/'+zipver+'.zip')
         Generator()
         os.system('git add --all')
         os.system('git commit -m "automatic update"')
         os.system('git push -u origin master')
         os.system(kodiRsync_LocalToRemote)
-        self.root.quit()
-
-def kodi_GUI_GenBuild():
-    os.chdir(kodiGitREPO)
-    top=Tk.Tk()
-    app=Kodi_GEN_BUILD(top)
-    top.geometry('800x400+200+200')
-    top.mainloop()
+        self.root.destroy()
 
 class Kodi_GEN_BUILD(Tk.Toplevel):
     def __init__(self, parent):
+        global kodiBuildVer, kodiBuildDate, kodiBuildNotes, kodiLocalBuildVer, kodiPackagesDIR2, kodiBuildDescription, kodiUpdatedPackages, kodiRemovedPackages
         self.previousADDONS=[]
         self.recentlyINSTALLED=[]
+        self.recentlyUPDATED=[]
         self.recentlyREMOVED=[]
         self.kodiOldBuildADDONS=kodiOldBuildADDONS.split(', ')
         for addon in self.kodiOldBuildADDONS:
@@ -468,19 +556,20 @@ class Kodi_GEN_BUILD(Tk.Toplevel):
         for addon in kodiPackagesDIR2:
             if addon not in self.previousADDONS:
                 self.recentlyINSTALLED.append(addon)
+                kodiUpdatedPackages.append(addon)
             dir1=kodiADDONSDIR+addon
             dir2=kodiCURRENTBUILDADDONS+addon+'/'
-            print(dir1)
-            print(dir2)
             try:
                 result=same_folders(filecmp.dircmp(dir1, dir2))
             except:
                 pass
             if result == False:
-                self.recentlyINSTALLED.append(addon)
+                self.recentlyUPDATED.append(addon)
+                kodiUpdatedPackages.append(addon)
         for addon in self.previousADDONS:
             if addon not in kodiPackagesDIR2:
                 self.recentlyREMOVED.append(addon)
+                kodiRemovedPackages.append(addon)
         self.root=parent
         self.root.title("Kodi Build Details...")
         self.PanedWindow=ttk.Panedwindow(self.root, orient=Tk.VERTICAL)
@@ -526,7 +615,11 @@ class Kodi_GEN_BUILD(Tk.Toplevel):
         self.RecentlyInstalled.place(x=320, y=5)
         self.RecentlyInstalledADDONS=Tk.Listbox(self.BuildINFOLabelFrame, height=8, width=27)
         for package in self.recentlyINSTALLED:
-            self.RecentlyInstalledADDONS.insert(0, package)
+            if package not in kodiIgnore:
+                self.RecentlyInstalledADDONS.insert(0, package)
+        for package in self.recentlyUPDATED:
+            if package not in kodiIgnore:
+                self.RecentlyInstalledADDONS.insert(0, package)
         self.RecentlyInstalledADDONS.pack()
         self.RecentlyInstalledADDONS.place(x=320, y=25)
         self.RecentlyRemoved=Tk.Label(self.BuildINFOLabelFrame, text='Recently Removed')
@@ -534,7 +627,8 @@ class Kodi_GEN_BUILD(Tk.Toplevel):
         self.RecentlyRemoved.place(x=545, y=5)
         self.RecentlyRemovedADDONS=Tk.Listbox(self.BuildINFOLabelFrame, height=8, width=27)
         for package in self.recentlyREMOVED:
-            self.RecentlyRemovedADDONS.insert(0, package)
+            if package not in kodiIgnore:
+                self.RecentlyRemovedADDONS.insert(0, package)
         self.RecentlyRemovedADDONS.pack()
         self.RecentlyRemovedADDONS.place(x=545, y=25)
         self.PanedWindow.add(self.BuildINFOLabelFrame)
@@ -544,8 +638,29 @@ class Kodi_GEN_BUILD(Tk.Toplevel):
         self.button.place(x=720, y=360)
 
     def OnClick(self):
+        global kodiBuildVer, kodiBuildDate, kodiBuildNotes, kodiLocalBuildVer, kodiPackagesDIR2, kodiBuildDescription, kodiUpdatedPackages, kodiRemovedPackages
+        KodiNow=datetime.datetime.now()
+        kodiBuildDate=KodiNow.strftime("%d/%B/%Y")
+        os.chdir('/home/iainstott/Kodi/Archive/currentBuild')
+        nextbuild_VER=self.NextBuildVerStringVar.get()
+        nextbuild_DESC=self.NextBuildDescStringVar.get()
+        nextbuild_NOTES=self.NextBuildNotesStringVar.get()
+        os.system('zip -q -T -r -0 /home/iainstott/Kodi/current.zip ./* -x "*.zip"')
+        os.system('cp /home/iainstott/Kodi/current.zip /home/iainstott/Kodi/Archive/BuildArchive/'+nextbuild_VER+'.zip')
+        kodiBuildVer=nextbuild_VER
+        kodiLocalBuildVerBEG, kodiLocalBuildVerEND=kodiBuildVer.rsplit('.', 1)
+        kodiLocalBuildVerEND=int(kodiLocalBuildVerEND) + 1
+        kodiLocalBuildVer=str(kodiLocalBuildVerBEG)+'.'+str(kodiLocalBuildVerEND)
+        kodiBuildDescription=nextbuild_DESC
+        kodiBuildNotes=nextbuild_NOTES
+        kodiDBLogBuild()
+        kodi_GenBuildLog()
+        os.system(kodiRsync_LocalToRemoteBuildArchive)
         os.system(kodiRsync_LocalToRemote)
-        self.root.quit()
+        zipLIST=glob.glob('/home/iainstott/Kodi/Archive/BuildArchive/*.zip')
+        for zipFILE in zipLIST:
+            os.remove(zipFILE)
+        self.root.destroy()
 
 def kodi_CreateResetBUILD():
     pass
@@ -555,6 +670,6 @@ def kodi_RevertToResetBUILD():
 
 def kodi_CreateBACKUP():
     os.system(kodiRsync_Get_IPTVLists)
-    os.system(kodiRsync_Build_Current)
+    os.system(kodiRsync_Backup_Current)
 
 
