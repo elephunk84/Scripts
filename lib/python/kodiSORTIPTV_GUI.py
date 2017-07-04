@@ -114,10 +114,10 @@ def buildDICTIONARIES ():
         for line in lines:
             channellistsorted.write(line)
     with open('IPTVLists/Channels_SPORTS.txt', 'r') as sportslist:
-        lines=sportslist.readlines()
-        for line in lines:
-            line=line.rstrip('\n')
-            sportsLIST.append(line)
+        lines2=sportslist.readlines()
+        for line2 in lines2:
+            line2=line2.rstrip('\n')
+            sportsLIST.append(line2)
 
 def buildMasterDICT ():
     for key in mychannelsDICT.keys() & availchannelsDICT.keys():
@@ -155,9 +155,9 @@ def buildM3UFILE ():
                 f.write(fileHEADER+'\n')
                 myf.write(fileHEADER+'\n')
                 sf.write(fileHEADER+'\n')
-                normchannels=collections.OrderedDict(sorted(availchannelsDICT.items()))
+                normchannels=collections.OrderedDict(sorted(mychannelsDICTMASTER.items()))
+                print(normchannels)
                 for key, value in normchannels.items():
-                    print(key)
                     name=(value[0])
                     group=(value[1])
                     link=(value[2])
@@ -177,7 +177,7 @@ def buildM3UFILE ():
                 channels2=collections.OrderedDict(sorted(allchannelsDICT.items()))
                 for key, value in channels2.items():
                     if key in sportsLIST:
-                        sf.write(str(key)+'\n')
+                        sf.write(lineSTART+str(key)+'\n')
                         sf.write(str(value)+'\n')
     f.close()
     myf.close()
